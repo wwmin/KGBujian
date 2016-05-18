@@ -32,7 +32,7 @@
               attachTo: "bottom-right", //放置位置
               color: "#D84E13", //设置颜色
               opacity: .40,  //透明度
-              visible: true,  //初始化不可见
+              visible: false,  //初始化不可见
               width: 250,  //默认值是地图高度的 1/4th
               height: 210,  // 默认值是地图高度的 1/4th
               //maximizeButton:true,   // 最大化,最小化按钮，默认false
@@ -46,32 +46,33 @@
               // "english" is the default, which displays miles
               // use "metric" for kilometers
               scalebarUnit: "metric",
-              attachTo: "bottom-left",
+              attachTo: "bottom-left"
           });
 
-          var agoServiceURL = "http://60.29.110.104:6080/arcgis/rest/services/外业点位图map20151207/MapServer";
+          var agoServiceURL = "http://60.29.110.104:6080/arcgis/rest/services/一张网/一张网底图/MapServer";
           //var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4, 5, 6, 7] });
           var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL);
           map.addLayer(agoLayer);
 
           map.on("layers-add-result", initEditor);
 
-          var baseUrl = "http://60.29.110.104:6080/arcgis/rest/services/FeatureMap20151208/FeatureServer/"; //此图层只有层  ?
+          // var baseUrl = "http://60.29.110.104:6080/arcgis/rest/services/FeatureMap20151208/FeatureServer/"; //此图层只有层  ?
+          var baseUrl = "http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计/FeatureServer/"; //此图层只有层  ?
           var pointsOfInterest = new FeatureLayer(baseUrl + "0", {
               mode: FeatureLayer.MODE_ONDEMAND,
               outFields: ['*']
           });
-          var WildfireLine = new FeatureLayer(baseUrl + "1", {
-              mode: FeatureLayer.MODE_ONDEMAND,
-              outFields: ['*']
-          });
-          var evacuationPerimeter = new FeatureLayer(baseUrl + "2", {
-              mode: FeatureLayer.MODE_ONDEMAND,
-              outFields: ['*']
-          });
+          // var WildfireLine = new FeatureLayer(baseUrl + "1", {
+          //     mode: FeatureLayer.MODE_ONDEMAND,
+          //     outFields: ['*']
+          // });
+          // var evacuationPerimeter = new FeatureLayer(baseUrl + "2", {
+          //     mode: FeatureLayer.MODE_ONDEMAND,
+          //     outFields: ['*']
+          // });
 
           //map.addLayers([pointsOfInterest, WildfireLine, evacuationPerimeter]);
-          map.addLayers([pointsOfInterest, WildfireLine, evacuationPerimeter]);
+          map.addLayers([pointsOfInterest]);
           var sfs = new SimpleFillSymbol(
               "solid",
               new SimpleLineSymbol("solid", new Color([195, 176, 23]), 2),
@@ -82,7 +83,7 @@
           //esriConfig.defaults.io.proxyUrl = "proxy.ashx";
           //esriConfig.defaults.io.alwaysUseProxy = false;
           //esriConfig.defaults.geometryService = new GeometryService("http://60.29.110.104:6080/arcgis/rest/services/Utilities/Geometry/GeometryServer");
-          var parcelsLayer = new FeatureLayer("http://60.29.110.104:6080/arcgis/rest/services/FeatureMap20151208/FeatureServer/0", {
+          var parcelsLayer = new FeatureLayer("http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计/FeatureServer/0", {
               mode: FeatureLayer.MODE_ONDEMAND,
               outFields: ["*"]
           });  //空港点数据
@@ -252,14 +253,14 @@
           var pntSym3 = new PictureMarkerSymbol("images/CircleRed32.png", 25, 25);
 
           // 初始化查询任务与查询参数
-          var FeatureServerUrl="http://60.29.110.104:6080/arcgis/rest/services/FeatureMap20151208/FeatureServer/";
+          var FeatureServerUrl="http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计/FeatureServer/";
           // var queryTask = new QueryTask(FeatureServerUrl+"0"); //空港范围
           // var queryTask=new QueryTask(FeatureServerUrl+"0");
           // queryTask.on("complete", showResult);
           var queryTask;
           var query = new QueryT();
           query.returnGeometry = true;
-          query.outFields = ["OBJECTID", "TYPE", "CID", "NUM", "MONTH"];
+          query.outFields = ["OBJECTID", "类型", "CRDate", "Material", "DISTRICT","ROAD_LANE"];
 
           function activateTool() {
               var tool = null;

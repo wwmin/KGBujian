@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
-    <title>空港市政测量</title>
+    <title>空港部件调查</title>
         <link rel="shortcut icon" href="images/logo.ico" />
     <link rel="stylesheet" href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/claro/claro.css">
     <link rel="stylesheet" href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/dojo/dojox/grid/resources/claroGrid.css">
@@ -32,13 +32,13 @@
             空港市政计量网
         </div>-->
         <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left', splitter:'true'"
-            style="background-color: #acb386; width: 205px;">
-            <div><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;空港小物流计量</strong></div>
+            style="background-color: transparent; width: 205px;">
+            <div><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;空港部件统计</strong></div>
             <div id="editorDiv"></div>
             <!--<div id="printButton"></div>-->
         </div>
         <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"
-            style="background-color: #f5ffbf; padding: 5px;">
+            style="background-color: #FFFFFF; padding: 5px;">
             <div style="position: absolute; right: 0; top: 0; z-Index: 99;">
                 <div id="titlePane" data-dojo-type="dijit/TitlePane"
                     data-dojo-props="title:'测量', closable:'false', open:'true'">
@@ -61,36 +61,6 @@
                         </div>
                         <div id="box">
                             <div class="numSum">总数为：<span id="totalPopulation"></span>,其中月份有误个数：<span id="Other"></span></div>
-<!--                            <table class="tblist">
-                                <tr>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">1月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">2月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">3月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">4月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">5月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">6月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">7月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">8月</button></th>
-                                    <th><button class="mon" data-dojo-type="dijit/form/Button">9月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">10月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">11月</button></th>
-                                    <th><button class="mon"  data-dojo-type="dijit/form/Button">12月</button></th>
-                                </tr>
-                                <tr>
-                                    <td><span id="Span1"></span></td>
-                                    <td><span id="Span2"></span></td>
-                                    <td><span id="Span3"></span></td>
-                                    <td><span id="Span4"></span></td>
-                                    <td><span id="Span5"></span></td>
-                                    <td><span id="Span6"></span></td>
-                                    <td><span id="Span7"></span></td>
-                                    <td><span id="Span8"></span></td>
-                                    <td><span id="Span9"></span></td>
-                                    <td><span id="Span10"></span></td>
-                                    <td><span id="Span11"></span></td>
-                                    <td><span id="Span12"></span></td>
-                                </tr>
-                            </table>-->
                             <table class="tblist">
                                 <tr>
                                     <th><button data-dojo-type="dijit/form/Button">1月</button></th>
@@ -142,28 +112,16 @@
                         </div>
                     </div>
                 </div>
-<!--                <div id="identifyResultsPane" data-dojo-type="dijit/layout/ContentPane" style="overflow: hidden;" title="查询结果">
-                    <div id="resultsDiv">
-                    </div>
-                    <br>
-                </div>
-                <div id="parcelResultsPane" data-dojo-type="dijit/layout/ContentPane" title="缓冲区分析">
-                </div>
-                <div data-dojo-type="dijit/layout/ContentPane" style="width: 100%" title="图层控制">
-                    <br>
-                    <div id="layerConfigDiv">
-                    </div>
-                </div>-->
             </div>
         </div>
 
-<!--        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:'true'"
-            style="background-color: #b39b86; height: 30px;">
-            天津容数科技
+ <!--       <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:'true'"
+            style="background-color: #f3ffff; height: 10px;">
+            <small>天津容数科技</small>
         </div>-->
         <div id="HomeButton"></div>
         <div id="LocateButton"></div>
-        <span id="XYinfo" style="background-color: none; font-weight: normal; font-size: smaller;color:#f5ffbf; position: absolute; padding: 2px; left: 240px; bottom: 2px; z-index: 99;"></span>
+        <span id="XYinfo" style="background-color: transparent; font-weight: normal; font-size: smaller;color:#f5ffbf; position: absolute; padding: 2px; left: 240px; bottom: 2px; z-index: 99;"></span>
     </div>
 </body>
 </html>
