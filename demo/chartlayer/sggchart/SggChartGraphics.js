@@ -112,11 +112,11 @@ dojo.declare("sggchart.SggPieChart", sggchart.SggChartGraphics, {
                      break;
                 }
                 case "onmouseout":{
-                    //TODO...
+                    //
                     break;
                 }
                 default:{
-                    //TODO...
+                    //
                     break;
                 }
             }

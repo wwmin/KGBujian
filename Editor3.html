@@ -67,9 +67,7 @@
                         <!--<button data-dojo-type="dijit/form/Button" id="btnTS" title="手动画图实现查找范围">徒手</button>-->
                         <button data-dojo-type="dijit/form/Button" title="清空查找结果，快捷键ESC">清空</button>
                     </div>
-                    <div id="box">
-                        <div class="numSum">总数为：<span id="totalPopulation"></span>,其中月份有误个数：<span id="Other"></span>
-                        </div>
+
                         <div style="padding-bottom: 10px;">
                             <input type="number"   placeholder="按年份查询" v-model="searchByYear">
                             <button type="button" @click="btnSearch">查询</button>
@@ -135,7 +133,9 @@
                     </div>
                     <div id="grid" data-dojo-type="dojox/grid/DataGrid" data-dojo-id="gridWidget"></div>
                     <div class="Dislist">
-                        <span>类型列表</span>
+                        <span>类型列表</span> <div id="box">
+                        <div class="numSum">总数为：<span id="totalPopulation"></span>,其中月份有误个数：<span id="Other"></span>
+                        </div>
                         <ul>
                             <li>0-侧石<span id="type0">&nbsp;</span></li>
                             <li>1-车行道<span id="type1">&nbsp;</span></li>
@@ -146,6 +146,11 @@
                             <li>6-人行道挖掘修复<span id="type6">&nbsp;</span></li>
                             <li>7-收水井<span id="type7">&nbsp;</span></li>
                         </ul>
+                        <table>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -159,7 +164,7 @@
     <div id="HomeButton"></div>
     <div id="LocateButton"></div>
     <span id="XYinfo"
-          style="background-color: transparent; font-weight: normal; font-size: smaller;color:#FFFFFF; position: absolute; padding: 2px; left: 240px; bottom: 2px; z-index: 99;"></span>
+          style="background-color:transparent; font-weight: normal; font-size: smaller;color:#FFFFFF; position: absolute; padding: 2px; left: 240px; bottom: 2px; z-index: 99;"></span>
 </div>
 
 </body>

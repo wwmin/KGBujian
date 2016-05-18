@@ -32,11 +32,11 @@
               attachTo: "bottom-right", //放置位置
               color: "#D84E13", //设置颜色
               opacity: .40,  //透明度
-              visible: false,  //初始化不可见
+              visible: false,  //初始化是否可见
               width: 250,  //默认值是地图高度的 1/4th
               height: 210,  // 默认值是地图高度的 1/4th
               //maximizeButton:true,   // 最大化,最小化按钮，默认false
-              expandFactor: 1.5 //概览地图和总览图上显示的程度矩形的大小之间的比例。默认值是2，这意味着概览地图将至少是两倍的大小的程度矩形。
+              expandFactor: 2.5 //概览地图和总览图上显示的程度矩形的大小之间的比例。默认值是2，这意味着概览地图将至少是两倍的大小的程度矩形。
           });
           overviewMapDijit.startup();
 
@@ -229,7 +229,7 @@
           //显示地图坐标
           function showCoordinates(evt) {
               var mp = evt.mapPoint;
-              dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x + " , " + mp.y;  //toFiex(2) 限制小数点后显示的位数
+              dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x + " , " + mp.y;  //toFiex(2) 限制小数点后显示的位数 //TODO:toFiex(2)为什么报错了
           }
           map.on("key-down", function (e) {
               if (e.keyCode == 27) {
@@ -258,9 +258,9 @@
           // var queryTask=new QueryTask(FeatureServerUrl+"0");
           // queryTask.on("complete", showResult);
           var queryTask;
-          var query = new QueryT();
+          var query = new QueryT(); //todo:解决冲突
           query.returnGeometry = true;
-          query.outFields = ["OBJECTID", "类型", "CRDate", "Material", "DISTRICT","ROAD_LANE"];
+          query.outFields = ["OBJECTID", "Type", "CRDate", "Material", "DISTRICT","ROAD_LANE"];
 
           function activateTool() {
               var tool = null;
@@ -278,15 +278,21 @@
                       case "徒手":
                           remove();
                           tool = "FREEHAND_POLYGON";
+                          tb.activate(Draw[tool]);
                           break;
                       case "物流范围":
                           remove();
-                          queryTask=new QueryTask(FeatureServerUrl+"1");
+                          queryTask=new QueryTask(FeatureServerUrl+"0");
                           queryTask.on("complete", showResult);
-                          addGraphicALL();
+                          addGraphicALLWuLiu();
                           break;
+                      case "海港范围":
+                          remove();
+                          queryTask=new QueryTask(FeatureServerUrl+"0");
+                          queryTask.on("complete", showResult);
+                          addGraphicALLHaiGang();
                   }
-                  tb.activate(Draw[tool]);
+                  // tb.activate(Draw[tool]);
                   //map.hideZoomSlider();
               }
           }
@@ -295,9 +301,10 @@
               var layout = [
                   //{ field: 'OBJECTID', name: '标识ID', width: "50px", headerStyles: "text-align:center;" },
                   { field: 'TYPE', name: '类型', width: "48px", headerStyles: "text-align:center;" },
-                  { field: 'CID', name: '编码', width: "48px", headerStyles: "text-align:center;" },
-                  { field: 'NUM', name: '数量', width: "48px", headerStyles: "text-align:center;" },
-                  { field: 'MONTH', name: '月份', width: "48px", headerStyles: "text-align:center;" }
+                  { field: 'Material', name: '材质', width: "48px", headerStyles: "text-align:center;" },
+                  { field: 'CRDate', name: '时间', width: "48px", headerStyles: "text-align:center;" },
+                  { field: 'ROAD_LANE', name: '道路名', width: "48px", headerStyles: "text-align:center;" },
+                  { field: 'Remark', name: '备注', width: "48px", headerStyles: "text-align:center;" }
               ];
               gridWidget.setStructure(layout);
           }
@@ -319,18 +326,20 @@
           }
 
 
+          //空港范围
           function addGraphicALL() {
               //自己实现一个polygon，以便自动覆盖全区所有范围
               var polygon = new Polygon({
                   "rings": [
                     [
-                        [13058455.6036, 4732130.0963],
-                        [13110312.3447, 4719396.2062],
-                        [13114701.4726, 4721075.9959],
-                        [13116855.3971, 4727944.1698],
-                        [13077773.1877, 4746340.5785],
-                        [13054974.1037, 4747776.5273],
-                        [13058455.6036, 4732130.0963]
+                        [13060645.6036, 4744403.0963],
+                        [13062042.3447, 4742608.2062],
+                        [13064331.4726, 4737571.9959],
+                        [13062671.3971, 4732356.1698],
+                        [13077454.1877, 4730866.5785],
+                        [13078995.1037, 4745564.5273],
+                        [13068039.6036, 4746326.0963],
+                        [13060645.6036, 4744403.0963]
                     ]
                   ],
                   "spatialReference": {
@@ -342,7 +351,50 @@
               query.geometry = handgraphic.geometry;
               queryTask.execute(query);
           }
-
+          //海港范围
+          function addGraphicALLHaiGang() {
+              //自己实现一个polygon，以便自动覆盖全区所有范围
+              var polygon = new Polygon({
+                  "rings": [
+                      [
+                          [13103354.6036, 4722610.0963],
+                          [13111008.3447, 4719393.2062],
+                          [13110652.4726, 4724574.9959],
+                          [13105013.3971, 4726708.1698],
+                          [13103354.6036, 4722610.0963]
+                      ]
+                  ],
+                  "spatialReference": {
+                      "wkid": 102100
+                  }
+              });
+              var handgraphic = new Graphic(polygon, symbol);
+              //map.graphics.add(handgraphic);//不显示画出来的线
+              query.geometry = handgraphic.geometry;
+              queryTask.execute(query);
+          }
+          //物流范围
+          function addGraphicALLWuLiu() {
+              //自己实现一个polygon，以便自动覆盖全区所有范围
+              var polygon = new Polygon({
+                  "rings": [
+                      [
+                          [13058988.6036, 4742354.0963],
+                          [13060191.3447, 4737376.2062],
+                          [13063408.4726, 4738747.9959],
+                          [13061613.3971, 4743336.1698],
+                          [13058988.6036, 4742354.0963]
+                      ]
+                  ],
+                  "spatialReference": {
+                      "wkid": 102100
+                  }
+              });
+              var handgraphic = new Graphic(polygon, symbol);
+              //map.graphics.add(handgraphic);//不显示画出来的线
+              query.geometry = handgraphic.geometry;
+              queryTask.execute(query);
+          }
           //Set drawing properties and add polygon to map
           function addGraphic(geometry) {
               var handgraphic = new Graphic(geometry, symbol);
@@ -574,7 +626,6 @@
               return Month1 + "," + Month2 + "," + Month3 + "," + Month4 + "," + Month5 + "," + Month6 + "," + Month7 + "," + Month8 + "," + Month9 + "," + Month10 + "," + Month11 + "," + Month12 + "," + Other;
           }
 
-
           //创建临时图形图层,为Table点击生成临时高亮点，容易清理
           var TempLayer = new GraphicsLayer();
           map.addLayer(TempLayer, 2);
@@ -619,7 +670,6 @@
               TempLayer.clear();
               map.infoWindow.hide();
               //Reset the divs to display 0
-              
               dojo.byId('Span1').innerHTML = "";
               dojo.byId('Span2').innerHTML = "";
               dojo.byId('Span3').innerHTML = "";
