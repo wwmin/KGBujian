@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bootstrap In Practice - Landing Page Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8"/>
+    <!-- Bootstrap -->
+    <!-- 引入 Bootstrap -->
+    <link href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <!--<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">-->
+    <!--<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">-->
+    <!--<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet" />-->
+    <!--<link href="http://fonts.googleapis.com/css?family=Abel|Open+Sans:400,600" rel="stylesheet" />-->
+
+    <style>
+        html {
+            background: url("http://area.sinaapp.com/bingImg") no-repeat center center fixed;
+            /*background: #fffff4;*/
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+        body {
+            padding-top: 50px;
+            font-size: 16px;
+            font-family: "Open Sans",serif;
+            background: transparent;  //背景透明
+        }
+        h1 {
+            font-family: "Abel", Arial, sans-serif;
+            font-weight: 400;
+            font-size: 40px;
+        }
+        /* Override B3 .panel adding a subtly transparent background */
+        .panel {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .margin-base-vertical {
+            margin: 40px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4 panel panel-default">
+            <h1 class="margin-base-vertical text-center">欢迎登陆空港计量</h1>
+
+            <form action="" method="post" class="margin-base-vertical">
+
+                <p class="input-group">
+
+                    <!--<span class="input-group-addon" style="font-size: 18px;width: 5em;">用户名</span>-->
+                    <span class="input-group-addon span5">用户名</span>
+                    <input id="name" type="text" class="form-control input-lg" name="name" placeholder="输入用户名" />
+                </p>
+                <p class="input-group">
+                    <!--<span class="input-group-addon" style="font-size: 18px;width: 5em;">密&nbsp;码</span>-->
+                    <span class="input-group-addon" >密&nbsp;码</span>
+                    <input id="pw" type="password" class="form-control input-lg" name="pw" placeholder="输入密码" />
+                </p>
+                <div class="form-group">
+                    <div class="col-sm-offset-1 col-sm-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox"> 请记住我
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <p class="help-block text-center"><small>&nbsp;</small></p>
+                <p class="text-center">
+                    <button type="submit" class="btn btn-success btn-lg btn-primary btn-block btn-login" data-toggle="modal" data-target="#myModal">&nbsp;&nbsp;登&nbsp;&nbsp;&nbsp;陆&nbsp;&nbsp;</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <!-- 按钮触发模态框 -->
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+        开始演示模态框
+    </button>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        模态框（Modal）标题
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    按下 ESC 按钮退出。
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                        提交更改
+                    </button>
+
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <script>
+        $(function() { $('#myModal').modal({
+            keyboard: true
+        })});
+
+    </script>
+    <!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- 包括所有已编译的插件 -->
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+</div>
+
+</body>
+</html>

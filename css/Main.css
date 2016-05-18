@@ -1,0 +1,181 @@
+﻿.dj_ie .infowindow .window .top .right .user .content
+{
+    position: relative;
+}
+
+.dj_ie .simpleInfoWindow .content
+{
+    position: relative;
+}
+
+html, body, #mainWindow
+{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #fffff4;
+    font-family: '微软雅黑';
+    overflow: hidden;
+}
+#buttonbox{ font-size:13px; margin-top:-7px;}
+
+.Dislist
+{
+    width:200px;
+    border:0;
+    padding:0;
+    position:relative;
+    top:10px;
+	font-size:13px;
+}
+.Dislist ul,.Dislist ul li
+    {
+        list-style-type:none;
+		margin-top:3px;
+    }
+.Dislist ul li
+{
+	line-height:16px;
+	list-style-image: url(../images/eg_arrow.gif);
+}
+
+#leftPane
+{
+    width: 190px;
+    border: none;
+    border-right: 1px;
+}
+
+#map
+{
+    padding: 0;
+    border: 1px solid #000;
+}
+
+#grid
+{ /*This div positions the results table */
+    border: 1px solid #A3C0E8;
+    width: 268px;
+    height:500px;
+    background-color: Transparent;
+	font-size:14px;
+    /*position: absolute;*/
+    /*left: 5px;
+    top: 165px;*/
+}
+
+#HomeButton
+{
+    position: absolute;
+    top: 110px;
+    left: 252px;
+    z-index: 50;
+}
+
+#LocateButton
+{
+    position: absolute;
+    top: 150px;
+    left: 252px;
+    z-index: 50;
+}
+
+#esri_dijit_editing_TemplatePicker_0
+{
+    height: 720px;
+}
+
+#box
+{ /*This div positions the results box */
+    /*border: 1px solid #333;*/
+    border:none;
+    width: 305px;
+    /*position: absolute;*/
+    /*left: 5px;
+    top: 80px;*/
+	margin-bottom:2px;
+}
+
+#mapbox
+{ /*This div positions the map on the page */
+    /*position: absolute;
+    left: 320px;
+    top: 10px;*/
+}
+
+#info
+{
+    position: absolute;
+    left: 5px;
+    top: 200px;
+}
+
+#legend
+{ /*Provides a simple legend for the population symbols */
+    border: 1px solid #333;
+    width: 305px;
+    position: absolute;
+    left: 5px;
+    top: 530px;
+    font-size: 0.9em;
+    font-family: Geneva, Arial, Helvetica, sans-serif;
+}
+
+.details
+{
+    font-weight: bold;
+}
+
+.numSum
+{
+    font-family:"宋体",Arial, Helvetica, sans-serif;
+    font-size:14px;
+	color:#FF0000;
+	line-height:24px;
+}
+
+
+
+.tblist{
+	font-family:"宋体",Arial, Helvetica, sans-serif;
+	background:#FFF;
+	border:1px solid #BED6F6;	/* 表格边框 */
+	border-collapse:collapse;	/* 边框重叠 */	/* 表格背景色 */
+	font-size:14px;
+    /*width:240px;*/
+}
+.tblist th{
+	background-color:#DBEBFF;	/* 行名称背景色 */			/* 行名称颜色 */
+	font-weight:bold;
+    font-size:smaller;
+	height:15px;
+	padding:1px;
+	border:1px solid #A3C0E8;
+
+}
+.tblist td{
+	border:1px solid #BED6F6;	/* 单元格边框 */
+	padding:2px;
+	height:20px;
+}
+ .tblist tr.altrow{
+	background-color:#F7FAFF;	/* 动态变色 */
+}
+.tblist tr:hover {background-color:#F9F9F9;	}
+
+.mon
+{
+    background-color:#DBEBFF;	/* 行名称背景色 */			/* 行名称颜色 */
+	font-weight:bold;
+    font-size:smaller;
+	height:15px;
+	padding:1px;
+	border:1px solid #A3C0E8;
+}
+
+#type0, #type1, #type2, #type3, #type4, #type5, #type6, #type7
+{
+    font:bold 14px arial verdana;
+    color:#5400fb;
+}

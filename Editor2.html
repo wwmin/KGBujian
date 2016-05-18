@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>空港市政测量</title>
+    <link rel="shortcut icon" href="images/logo.ico" />
+    <link rel="stylesheet" href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/dojo/dojox/grid/resources/claroGrid.css">
+    <link rel="stylesheet" href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/dojo/dojox/grid/resources/Grid.css">
+    <link rel="stylesheet" href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css" />
+    <script src="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/init.js"></script>
+    <link rel="stylesheet" href="css/Main.css" />
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="js/MainJS.js"></script>
+    <!--    <script type="text/javascript">
+        dojoConfig = {
+            isDebug: true,
+            async: true
+        };
+    </script>-->
+
+</head>
+<body class="claro">
+    <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:true" id="mainWindow">
+        <!--        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"
+            style="background-color: #b39b86; height: 5%;">
+            空港市政计量网
+        </div>-->
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'left', splitter:'true'"
+            style="background-color: #acb386; width: 205px;">
+            <div><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;空港小物流计量</strong></div>
+            <div id="editorDiv"></div>
+            <!--<div id="printButton"></div>-->
+        </div>
+        <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"
+            style="background-color: #f5ffbf; padding: 5px;">
+            <div style="position: absolute; right: 0; top: 0; z-Index: 99;">
+                <div id="titlePane" data-dojo-type="dijit/TitlePane"
+                    data-dojo-props="title:'测量', closable:'false', open:'true'">
+                    <div id="measurementDiv"></div>
+                    <span style="font-size: smaller; padding: 5px 5px;">按住<b>CTRL</b> 捕捉.</span>
+                </div>
+            </div>
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right', splitter:'true'"
+            style="background-color: #acb386; width: 250px;">
+
+           <div id="accordionContainer" data-dojo-type="dijit/layout/AccordionContainer"
+                style="padding: 0px; overflow: hidden; z-index: 29;">
+                            <div data-dojo-type="dijit/layout/ContentPane" title="查询" style="overflow: hidden;">
+                    <div id="findServicesDiv" style="width: auto;">
+                        <div id="buttonbox">
+                            <button data-dojo-type="dijit/form/Button" id="btnAll" title="查找全区(空港、小物流、海港)范围内的所有数据">全区范围</button>
+                            <button data-dojo-type="dijit/form/Button" id="btnTS" title="手动画图实现查找范围">徒手</button>
+                            <button data-dojo-type="dijit/form/Button" title="清空查找结果，快捷键ESC">清空</button>
+                        </div>
+                        <div id="box">
+                            <!--<div>总数为：<span id="numberOfBlocks">0</span></div>-->
+                            <div class="numSum">总数为：<span id="totalPopulation"></span>,其中月份有误个数：<span id="Other"></span></div>
+                            <!--<div>1月<span id="Span1">0</span>,2月<span id="Span13">0</span>,3月<span id="Span14">0</span>,4月<span id="Span15">0</span>,5月<span id="Span16">0</span>,6月<span id="Span17">0</span></div>-->
+                            <table class="tblist">
+                                <tr>
+                                    <th>1月</th>
+                                    <th>2月</th>
+                                    <th>3月</th>
+                                    <th>4月</th>
+                                    <th>5月</th>
+                                    <th>6月</th>
+                                    <th>7月</th>
+                                    <th>8月</th>
+                                    <th>9月</th>
+                                    <th>10月</th>
+                                    <th>11月</th>
+                                    <th>12月</th>
+                                </tr>
+                                <tr>
+                                    <td><span id="Span1"></span></td>
+                                    <td><span id="Span2"></span></td>
+                                    <td><span id="Span3"></span></td>
+                                    <td><span id="Span4"></span></td>
+                                    <td><span id="Span5"></span></td>
+                                    <td><span id="Span6"></span></td>
+                                    <td><span id="Span7"></span></td>
+                                    <td><span id="Span8"></span></td>
+                                    <td><span id="Span9"></span></td>
+                                    <td><span id="Span10"></span></td>
+                                    <td><span id="Span11"></span></td>
+                                    <td><span id="Span12"></span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="grid" data-dojo-type="dojox/grid/DataGrid" data-dojo-id="gridWidget"></div>
+                        <div>
+                            <ul>
+                                <li>0侧石</li>
+                                <li>1车行道</li>
+                                <li>2车行道挖掘修复</li>
+                                <li>3检查井</li>
+                                <li>4桥梁检查维修</li>
+                                <li>5人行道</li>
+                                <li>6人行道挖掘修复</li>
+                                <li>7收水井</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--                <div id="identifyResultsPane" data-dojo-type="dijit/layout/ContentPane" style="overflow: hidden;" title="查询结果">
+                    <div id="resultsDiv">
+                    </div>
+                    <br>
+                </div>
+                <div id="parcelResultsPane" data-dojo-type="dijit/layout/ContentPane" title="缓冲区分析">
+                </div>
+                <div data-dojo-type="dijit/layout/ContentPane" style="width: 100%" title="图层控制">
+                    <br>
+                    <div id="layerConfigDiv">
+                    </div>
+                </div>-->
+            </div>
+        </div>
+
+        <!--        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'bottom', splitter:'true'"
+            style="background-color: #b39b86; height: 30px;">
+            天津容数科技
+        </div>-->
+        <div id="HomeButton"></div>
+        <div id="LocateButton"></div>
+        <span id="XYinfo" style="background-color: none; font-weight: normal; font-size: smaller; color: #f5ffbf; position: absolute; padding: 2px; left: 240px; bottom: 2px; z-index: 99;"></span>
+    </div>
+</body>
+</html>

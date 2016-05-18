@@ -1,0 +1,44 @@
+﻿.dj_ie .infowindow .window .top .right .user .content {
+    position: relative;
+}
+.dj_ie .simpleInfoWindow .content {
+    position: relative;
+}
+
+html, body, #mainWindow {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+body
+{
+    background-color: #fffff4;
+    font-family: '微软雅黑';
+}
+#leftPane {
+    width: 190px;
+    /*border: none;*/
+    border-right: 1px;
+}
+#map {
+    padding: 0;
+    border:1px solid #000;
+}
+#HomeButton
+{
+    position: absolute;
+    top: 95px;
+    left: 225px;
+    z-index: 50;
+}
+#LocateButton {
+    position: absolute;
+    top: 135px;
+    left: 225px;
+    z-index: 50;
+}
+#esri_dijit_editing_TemplatePicker_0{
+    height:720px;
+}

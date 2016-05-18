@@ -1,0 +1,641 @@
+﻿http://blog.csdn.net/gisshixisheng/article/details/40817763
+作者博客地址
+
+咱们书接上文，在上文，实现了基于距离的空间聚类的算法实现，在本文，将继续介绍空间聚类之基于区域范围的实现方式，好了，闲言少叙，先看看具体的效果：
+
+聚类效果
+
+点击显示信息
+
+显示单个聚类点
+下面说说具体的实现思路。
+1、数据组织
+在进行数据组织的时候，因为是要按照区域范围的，所以必须得包含区域范围的信息，在本示例中，我用的数据依然是全国2000多个区县点的数据，并添加了省市代码，数据如下：
+
+2、聚类思路
+根据数据中“procode”去判断类别，是同一类别就将该类别添加到该类别的数据中，并将计数增加1，思路很简单，对graphiclayer进行了扩展，源代码如下：
+[javascript] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+define([  
+    "dojo/_base/declare",  
+    "dojo/_base/array",  
+    "esri/Color",  
+    "dojo/_base/connect",  
+  
+    "esri/SpatialReference",  
+    "esri/geometry/Point",  
+    "esri/graphic",  
+    "esri/symbols/SimpleMarkerSymbol",  
+    "esri/symbols/TextSymbol",  
+  
+    "esri/dijit/PopupTemplate",  
+    "esri/layers/GraphicsLayer"  
+], function (  
+    declare, arrayUtils, Color, connect,  
+    SpatialReference, Point, Graphic, SimpleMarkerSymbol, TextSymbol,  
+    PopupTemplate, GraphicsLayer  
+    ) {  
+    return declare([GraphicsLayer], {  
+        constructor: function(options) {  
+            // 参数:  
+            //   data:  Object[]  
+            //     Array of objects. Required. Object are required to have properties named x, y and attributes. The x and y coordinates have to be numbers that represent a points coordinates.  
+            //   field:  string?  
+            //     The field of cluster.  
+            //   showSingles:  Boolean?  
+            //     Optional. Whether or graphics should be displayed when a cluster graphic is clicked. Default is true.  
+            //   labelColor:  String?  
+            //     Optional. Hex string or array of rgba values used as the color for cluster labels. Default value is #fff (white).  
+            //   labelOffset:  String?  
+            //     Optional. Number of pixels to shift a cluster label vertically. Defaults to -5 to align labels with circle symbols. Does not work in IE.  
+            //   singleSymbol:  MarkerSymbol?  
+            //     Marker Symbol (picture or simple). Optional. Symbol to use for graphics that represent single points. Default is a small gray SimpleMarkerSymbol.  
+            //   spatialReference:  SpatialReference?  
+            //     Optional. Spatial reference for all graphics in the layer. This has to match the spatial reference of the map. Default is 102100. Omit this if the map uses basemaps in web mercator.  
+            //   singleTemplate:  PopupTemplate?  
+            //     PopupTemplate</a>. Optional. Popup template used to format attributes for graphics that represent single points. Default shows all attributes as "attribute = value" (not recommended).  
+  
+            //聚类的字段  
+            this._clusterField = options.field || "";  
+            //聚类数据  
+            this._clusterData = options.data || [];  
+            this._clusters = [];  
+            //标注颜色，默认为白色  
+            this._clusterLabelColor = options.labelColor || "#000";  
+            //标注偏移，默认为-5  
+            this._clusterLabelOffset = (options.hasOwnProperty("labelOffset")) ? options.labelOffset : -5;  
+  
+            this._showSingles = options.hasOwnProperty("showSingles") ? options.showSingles : true;  
+            //单个对象  
+            this._singles = []; //点击时出现  
+            // 单个的样式  
+            var SMS = SimpleMarkerSymbol;  
+            this._singleSym = options.singleSymbol || new SMS("circle", 6, null, new Color(options.singleColor,0.6));  
+            //空间参考  
+            this._sr = options.spatialReference || new SpatialReference({ "wkid": 102100 });  
+            //地图缩放  
+            this._zoomEnd = null;  
+  
+            this._singleTemplate = options.singleTemplate || new PopupTemplate({ "title": "", "description": "{*}" });  
+        },  
+  
+        // 重构esri/layers/GraphicsLayer方法  
+        _setMap: function(map, surface) {  
+            this._clusterGraphics();  
+  
+            /*// 地图缩放重新聚类 
+            this._zoomEnd = connect.connect(map, "onZoomEnd", this, function() { 
+                this.clear(); 
+                this._clusterGraphics(); 
+            });*/  
+  
+            // GraphicsLayer will add its own listener here  
+            var div = this.inherited(arguments);  
+            return div;  
+        },  
+  
+        _unsetMap: function() {  
+            this.inherited(arguments);  
+            connect.disconnect(this._zoomEnd);  
+        },  
+  
+        // public ClusterLayer methods  
+        add: function(p) {  
+            // Summary:  The argument is a data point to be added to an existing cluster. If the data point falls within an existing cluster, it is added to that cluster and the cluster's label is updated. If the new point does not fall within an existing cluster, a new cluster is created.  
+            //  
+            // if passed a graphic, use the GraphicsLayer's add method  
+            if ( p.declaredClass ) {  
+                this.inherited(arguments);  
+                return;  
+            }  
+  
+            // add the new data to _clusterData so that it's included in clusters  
+            // when the map level changes  
+            this._clusterData.push(this._clusters);  
+            var clustered = false;  
+            // look for an existing cluster for the new point  
+            for ( var i = 0; i < this._clusters.length; i++ ) {  
+                var c = this._clusters[i];  
+                if ( this._clusterTest(p, c) ) {  
+                    // add the point to an existing cluster  
+                    this._clusterAddPoint(p, c);  
+                    // update the cluster's geometry  
+                    this._updateClusterGeometry(c);  
+                    // update the label  
+                    this._updateLabel(c);  
+                    clustered = true;  
+                    break;  
+                }  
+            }  
+  
+            if ( ! clustered ) {  
+                this._clusterCreate(p);  
+                p.attributes.clusterCount = 1;  
+                this._showCluster(p);  
+            }  
+        },  
+  
+        clear: function() {  
+            // Summary:  Remove all clusters and data points.  
+            this.inherited(arguments);  
+            this._clusters.length = 0;  
+        },  
+  
+        clearSingles: function(singles) {  
+            // Summary:  Remove graphics that represent individual data points.  
+            var s = singles || this._singles;  
+            arrayUtils.forEach(s, function(g) {  
+                this.remove(g);  
+            }, this);  
+            this._singles.length = 0;  
+            map.graphics.clear();  
+        },  
+  
+        onClick: function(e) {  
+            // remove any previously showing single features  
+            this.clearSingles(this._singles);  
+  
+            // find single graphics that make up the cluster that was clicked  
+            // would be nice to use filter but performance tanks with large arrays in IE  
+            var singles = [];  
+            for ( var i = 0, il = this._clusterData.length; i < il; i++) {  
+                if ( e.graphic.attributes.clusterId == this._clusterData[i].attributes.clusterId ) {  
+                    singles.push(this._clusterData[i]);  
+                }  
+            }  
+            if ( singles.length > this._maxSingles ) {  
+                alert("Sorry, that cluster contains more than " + this._maxSingles + " points. Zoom in for more detail.");  
+                return;  
+            } else {  
+                // stop the click from bubbling to the map  
+                e.stopPropagation();  
+                this._map.infoWindow.show(e.graphic.geometry);  
+                this._addSingles(singles);  
+            }  
+        },  
+  
+        // 图形聚类  
+        _clusterGraphics: function() {  
+            // first time through, loop through the points  
+            for ( var j = 0, jl = this._clusterData.length; j < jl; j++ ) {  
+                // see if the current feature should be added to a cluster  
+                var point = this._clusterData[j];  
+  
+                var clustered = false;  
+                for ( var i = 0, numClusters = this._clusters.length; i < numClusters; i++ ) {  
+                    var c = this._clusters[i];  
+                    if ( this._clusterTest(point, c) ) {  
+                        var pt = new esri.geometry.Point(point.x,point.y);  
+                        this._clusterAddPoint(point, c);  
+                        clustered = true;  
+                        break;  
+                    }  
+                }  
+                if ( ! clustered ) {  
+                    this._clusterCreate(point);  
+                }  
+            }  
+            this._showAllClusters();  
+        },  
+  
+        _clusterTest: function(p, cluster) {  
+            if(p.attributes.proCode === cluster.field){  
+//                console.log("true");  
+                return true;  
+            }  
+            else{  
+//                console.log("false");  
+                return false;  
+            }  
+        },  
+  
+        // points passed to clusterAddPoint should be included  
+        // in an existing cluster  
+        // also give the point an attribute called clusterId  
+        // that corresponds to its cluster  
+        _clusterAddPoint: function(p, cluster) {  
+            // average in the new point to the cluster geometry  
+            var count, field;  
+            count = cluster.attributes.clusterCount;  
+            field = p.attributes.proCode;  
+            cluster.field = field;  
+            // increment the count  
+            cluster.attributes.clusterCount++;  
+            // attributes might not exist  
+            if ( ! p.hasOwnProperty("attributes") ) {  
+                p.attributes = {};  
+            }  
+            // give the graphic a cluster id  
+            p.attributes.clusterId = cluster.attributes.clusterId;  
+        },  
+  
+        // point passed to clusterCreate isn't within the  
+        // clustering distance specified for the layer so  
+        // create a new cluster for it  
+        _clusterCreate: function(p) {  
+            var clusterId = this._clusters.length + 1;  
+            // console.log("cluster create, id is: ", clusterId);  
+            // p.attributes might be undefined  
+            if ( ! p.attributes ) {  
+                p.attributes = {};  
+            }  
+            p.attributes.clusterId = clusterId;  
+            // create the cluster  
+            var cluster = {  
+                "x": p.x,  
+                "y": p.y,  
+                "field": p.attributes.proCode,  
+                "attributes" : {  
+                    "clusterCount": 1,  
+                    "clusterId": clusterId  
+                }  
+            };  
+            this._clusters.push(cluster);  
+        },  
+  
+        _showAllClusters: function() {  
+            for ( var i = 0, il = this._clusters.length; i < il; i++ ) {  
+                var c = this._clusters[i];  
+                this._showCluster(c);  
+            }  
+        },  
+  
+        _showCluster: function(c) {  
+            var point = new Point(c.x, c.y, this._sr);  
+            this.add(  
+                new Graphic(  
+                    point,  
+                    null,  
+                    c.attributes  
+                )  
+            );  
+            // code below is used to not label clusters with a single point  
+            if ( c.attributes.clusterCount == 1 ) {  
+                return;  
+            }  
+  
+            // show number of points in the cluster  
+            var font  = new esri.symbol.Font()  
+                .setSize("10pt")  
+                .setWeight(esri.symbol.Font.WEIGHT_BOLD);  
+            var label = new TextSymbol(c.attributes.clusterCount)  
+                .setColor(new Color(this._clusterLabelColor))  
+                .setOffset(0, this._clusterLabelOffset)  
+                .setFont(font);  
+            this.add(  
+                new Graphic(  
+                    point,  
+                    label,  
+                    c.attributes  
+                )  
+            );  
+        },  
+  
+        _addSingles: function(singles) {  
+            var mlPoint = new esri.geometry.Multipoint(this._sr);  
+            // add single graphics to the map  
+            arrayUtils.forEach(singles, function(p) {  
+                var pt = new Point(p.x, p.y, this._sr);  
+                mlPoint.addPoint(pt);  
+                var g = new Graphic(  
+                    pt,  
+                    this._singleSym,  
+                    p.attributes,  
+                    this._singleTemplate  
+                );  
+                this._singles.push(g);  
+                if ( this._showSingles ) {  
+                    this.add(g);  
+                }  
+            }, this);  
+            map.setExtent(mlPoint.getExtent().expand(2.5));  
+            var singleCenter = mlPoint.getExtent().getCenter();  
+            var font  = new esri.symbol.Font();  
+            font.setSize("15pt");  
+            font.setFamily("微软雅黑");  
+            font.setWeight("bold");  
+            var text = new esri.symbol.TextSymbol(singles[0].attributes.proName);  
+            text.setFont(font);  
+            text.setColor(new Color([0,0,0]));  
+            var labelGraphic = new esri.Graphic(singleCenter,text);  
+            map.graphics.add(labelGraphic);  
+            this._map.infoWindow.setFeatures(this._singles);  
+        },  
+  
+        _updateClusterGeometry: function(c) {  
+            // find the cluster graphic  
+            var cg = arrayUtils.filter(this.graphics, function(g) {  
+                return ! g.symbol &&  
+                    g.attributes.clusterId == c.attributes.clusterId;  
+            });  
+            if ( cg.length == 1 ) {  
+                cg[0].geometry.update(c.x, c.y);  
+            } else {  
+                console.log("didn't find exactly one cluster geometry to update: ", cg);  
+            }  
+        },  
+  
+        _updateLabel: function(c) {  
+            // find the existing label  
+            var label = arrayUtils.filter(this.graphics, function(g) {  
+                return g.symbol &&  
+                    g.symbol.declaredClass == "esri.symbol.TextSymbol" &&  
+                    g.attributes.clusterId == c.attributes.clusterId;  
+            });  
+            if ( label.length == 1 ) {  
+                // console.log("update label...found: ", label);  
+                this.remove(label[0]);  
+                var newLabel = new TextSymbol(c.attributes.clusterCount)  
+                    .setColor(new Color(this._clusterLabelColor))  
+                    .setOffset(0, this._clusterLabelOffset);  
+                this.add(  
+                    new Graphic(  
+                        new Point(c.x, c.y, this._sr),  
+                        newLabel,  
+                        c.attributes  
+                    )  
+                );  
+                // console.log("updated the label");  
+            } else {  
+                console.log("didn't find exactly one label: ", label);  
+            }  
+        },  
+  
+        // debug only...never called by the layer  
+        _clusterMeta: function() {  
+            // print total number of features  
+            console.log("Total:  ", this._clusterData.length);  
+  
+            // add up counts and print it  
+            var count = 0;  
+            arrayUtils.forEach(this._clusters, function(c) {  
+                count += c.attributes.clusterCount;  
+            });  
+            console.log("In clusters:  ", count);  
+        }  
+    });  
+});  
+接着将之导入，并调用：
+[javascript] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+var dojoConfig = {  
+    paths: {  
+        extras: location.pathname.replace(/\/[^/]+$/, "") + "/extras"  
+    }  
+};  
+
+[javascript] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+require([......  
+    "extras/ZoneClusterLayer",  
+    "dojo/domReady!"  
+], function(  
+    ......,  
+    ZoneClusterLayer  
+){  
+新建clusterlayer对象，并将之添加到map：
+[javascript] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+function addClusters(items) {  
+    var countyInfo = {};  
+    countyInfo.data = arrayUtils.map(items, function(item) {  
+        var latlng = new  Point(parseFloat(item.x), parseFloat(item.y), map.spatialReference);  
+        var webMercator = webMercatorUtils.geographicToWebMercator(latlng);  
+        var attributes = {  
+            "proName": item.attributes.proname,  
+            "proCode":item.procode,  
+            "countyName": item.attributes.countyname,  
+            "lng": item.x,  
+            "lat": item.y  
+        };  
+        return {  
+            "x": webMercator.x,  
+            "y": webMercator.y,  
+            "attributes": attributes  
+        };  
+    });  
+    clusterLayer = new ZoneClusterLayer({  
+        "data": countyInfo.data,  
+        "id": "clusters",  
+        "labelColor": "#fff",  
+        "labelOffset": -4,  
+        "singleColor": "#0ff",  
+        "field":"proCode"  
+    });  
+    var defaultSym = new SimpleMarkerSymbol().setSize(4);  
+    var renderer = new ClassBreaksRenderer(defaultSym, "clusterCount");  
+  
+    /*var picBaseUrl = "images/"; 
+     var blue = new PictureMarkerSymbol(picBaseUrl + "BluePin1LargeB.png", 32, 32).setOffset(0, 15); 
+     var green = new PictureMarkerSymbol(picBaseUrl + "GreenPin1LargeB.png", 64, 64).setOffset(0, 15); 
+     var red = new PictureMarkerSymbol(picBaseUrl + "RedPin1LargeB.png", 80, 80).setOffset(0, 15);*/  
+    var style1 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10,  
+            new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                    new Color([255,200,0]), 1),  
+            new Color([255,200,0,0.8]));  
+    var style2 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 20,  
+            new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                    new Color([255,125,3]), 1),  
+            new Color([255,125,3,0.8]));  
+    var style3 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 23,  
+            new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                    new Color([255,23,58]), 1),  
+            new Color([255,23,58,0.8]));  
+    var style4 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 28,  
+            new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                    new Color([204,0,184]), 1),  
+            new Color([204,0,184,0.8]));  
+    var style5 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 33,  
+            new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                    new Color([0,0,255]), 1),  
+            new Color([0,0,255,0.8]));  
+    renderer.addBreak(1, 10, style1);  
+    renderer.addBreak(10, 50, style2);  
+    renderer.addBreak(50, 100, style3);  
+    renderer.addBreak(100, 150, style4);  
+    renderer.addBreak(150, 200, style5);  
+  
+    clusterLayer.setRenderer(renderer);  
+    map.addLayer(clusterLayer);  
+    // close the info window when the map is clicked  
+    map.on("click", cleanUp);  
+    // close the info window when esc is pressed  
+    map.on("key-down", function(e) {  
+        if (e.keyCode === 27) {  
+            cleanUp();  
+        }  
+    });  
+}  
+function cleanUp() {  
+    map.infoWindow.hide();  
+    clusterLayer.clearSingles();  
+}  
+
+调用的html的全代码如下：
+[html] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+<!doctype html>  
+<html>  
+<head>  
+    <meta charset="utf-8">  
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">  
+    <title>Zone Cluster</title>  
+    <link rel="stylesheet" href="http://localhost/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/tundra/tundra.css">  
+    <link rel="stylesheet" href="http://localhost/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css">  
+    <style>  
+        html, body, #map{ height: 100%; width: 100%; margin: 0; padding: 0; }  
+        #map{ margin: 0; padding: 0; }  
+    </style>  
+  
+    <script>  
+        // helpful for understanding dojoConfig.packages vs. dojoConfig.paths:  
+        // http://www.sitepen.com/blog/2013/06/20/dojo-faq-what-is-the-difference-packages-vs-paths-vs-aliases/  
+        var dojoConfig = {  
+            paths: {  
+                extras: location.pathname.replace(/\/[^/]+$/, "") + "/extras"  
+            }  
+        };  
+    </script>  
+    <script src="http://localhost/arcgis_js_api/library/3.9/3.9/init.js"></script>  
+    <script src="data/county.js"></script>  
+    <script>  
+        var map;  
+        var clusterLayer;  
+        require([  
+            "dojo/parser",  
+            "dojo/_base/array",  
+            "esri/map",  
+            "esri/layers/ArcGISTiledMapServiceLayer",  
+            "esri/layers/FeatureLayer",  
+            "esri/graphic",  
+            "esri/Color",  
+            "esri/symbols/SimpleMarkerSymbol",  
+            "esri/symbols/SimpleLineSymbol",  
+            "esri/symbols/SimpleFillSymbol",  
+            "esri/renderers/SimpleRenderer",  
+            "esri/renderers/ClassBreaksRenderer",  
+            "esri/SpatialReference",  
+            "esri/geometry/Point",  
+            "esri/geometry/webMercatorUtils",  
+            "extras/ZoneClusterLayer",  
+            "dojo/domReady!"  
+        ], function(  
+            parser,  
+            arrayUtils,  
+            Map,  
+            Tiled,  
+            FeatureLayer,  
+            Graphic,  
+            Color,  
+            SimpleMarkerSymbol,  
+            SimpleLineSymbol,  
+            SimpleFillSymbol,  
+            SimpleRenderer,  
+            ClassBreaksRenderer,  
+            SpatialReference,  
+            Point,  
+            webMercatorUtils,  
+            ZoneClusterLayer  
+        ){  
+            map = new Map("map", {logo:false,slider: true});  
+            var tiled = new Tiled("http://localhost:6080/arcgis/rest/services/image/MapServer");  
+            map.addLayer(tiled);  
+            tiled.hide();  
+            var fch = new FeatureLayer("http://localhost:6080/arcgis/rest/services/china/MapServer/0");  
+            var symbol = new SimpleFillSymbol(  
+                    SimpleFillSymbol.STYLE_SOLID,  
+                    new SimpleLineSymbol(  
+                            SimpleLineSymbol.STYLE_SOLID,  
+                            new esri.Color([180,180,180,1]), //设置RGB色，0.75设置透明度  
+                            2  
+                    ),  
+                    new esri.Color([150,150,150,0.2])  
+            );  
+            //简单渲染  
+            var simpleRender=new SimpleRenderer(symbol);  
+            fch.setRenderer(simpleRender);  
+            map.addLayer(fch);  
+            map.centerAndZoom(new Point(103.847, 36.0473, map.spatialReference),4);  
+  
+            map.on("load", function() {  
+                addClusters(county.items);  
+            });  
+  
+            function addClusters(items) {  
+                var countyInfo = {};  
+                countyInfo.data = arrayUtils.map(items, function(item) {  
+                    var latlng = new  Point(parseFloat(item.x), parseFloat(item.y), map.spatialReference);  
+                    var webMercator = webMercatorUtils.geographicToWebMercator(latlng);  
+                    var attributes = {  
+                        "proName": item.attributes.proname,  
+                        "proCode":item.procode,  
+                        "countyName": item.attributes.countyname,  
+                        "lng": item.x,  
+                        "lat": item.y  
+                    };  
+                    return {  
+                        "x": webMercator.x,  
+                        "y": webMercator.y,  
+                        "attributes": attributes  
+                    };  
+                });  
+                clusterLayer = new ZoneClusterLayer({  
+                    "data": countyInfo.data,  
+                    "id": "clusters",  
+                    "labelColor": "#fff",  
+                    "labelOffset": -4,  
+                    "singleColor": "#0ff",  
+                    "field":"proCode"  
+                });  
+                var defaultSym = new SimpleMarkerSymbol().setSize(4);  
+                var renderer = new ClassBreaksRenderer(defaultSym, "clusterCount");  
+  
+                /*var picBaseUrl = "images/";  
+                 var blue = new PictureMarkerSymbol(picBaseUrl + "BluePin1LargeB.png", 32, 32).setOffset(0, 15);  
+                 var green = new PictureMarkerSymbol(picBaseUrl + "GreenPin1LargeB.png", 64, 64).setOffset(0, 15);  
+                 var red = new PictureMarkerSymbol(picBaseUrl + "RedPin1LargeB.png", 80, 80).setOffset(0, 15);*/  
+                var style1 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10,  
+                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                                new Color([255,200,0]), 1),  
+                        new Color([255,200,0,0.8]));  
+                var style2 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 20,  
+                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                                new Color([255,125,3]), 1),  
+                        new Color([255,125,3,0.8]));  
+                var style3 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 23,  
+                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                                new Color([255,23,58]), 1),  
+                        new Color([255,23,58,0.8]));  
+                var style4 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 28,  
+                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                                new Color([204,0,184]), 1),  
+                        new Color([204,0,184,0.8]));  
+                var style5 = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 33,  
+                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,  
+                                new Color([0,0,255]), 1),  
+                        new Color([0,0,255,0.8]));  
+                renderer.addBreak(1, 10, style1);  
+                renderer.addBreak(10, 50, style2);  
+                renderer.addBreak(50, 100, style3);  
+                renderer.addBreak(100, 150, style4);  
+                renderer.addBreak(150, 200, style5);  
+  
+                clusterLayer.setRenderer(renderer);  
+                map.addLayer(clusterLayer);  
+                // close the info window when the map is clicked  
+                map.on("click", cleanUp);  
+                // close the info window when esc is pressed  
+                map.on("key-down", function(e) {  
+                    if (e.keyCode === 27) {  
+                        cleanUp();  
+                    }  
+                });  
+            }  
+            function cleanUp() {  
+                map.infoWindow.hide();  
+                clusterLayer.clearSingles();  
+            }  
+        });  
+    </script>  
+</head>  
+  
+<body>  
+    <div id="map"></div>  
+</div>  
+</body>  
+</html>  

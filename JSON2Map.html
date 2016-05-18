@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>北京地铁</title>
+    <link rel="stylesheet" href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="http://localhost/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css">
+    <style>
+        html, body, #map{
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .stat-name-box{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            z-index: 10;
+            border: rgb(139, 164, 220) 1px solid;
+            width: auto;
+            height: auto;
+            font:normal 11px "宋体",Arial;
+            color: rgb(0, 0, 0);
+            background: rgb(255, 255, 255);
+            box-shadow: rgba(0, 0, 0, 0.34902) 2px 2px 3px;
+            border-radius: 3px;
+            padding: 3px 5px;
+        }
+        .legend-box{
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            border: rgb(139, 164, 220) 1px solid;
+            width: 130px;
+            height: auto;
+            color: rgb(0, 0, 0);
+            background: rgb(255, 255, 255);
+            box-shadow: rgba(0, 0, 0, 0.34902) 2px 2px 3px;
+            border-radius: 3px;
+        }
+        tr{
+            padding: 2px 8px;
+        }
+        .tr-title{
+            text-align: center;
+            font:bold 13px "宋体",Arial;
+            padding: 3px 0px;
+            background: rgb(139, 164, 220);
+            color: #ffffff;
+            border-radius: 3px;
+        }
+        .tr-title:hover{
+            cursor: pointer;
+        }
+        .legend-item-color{
+            width: 10px;
+            height: 10px;
+            float: left;
+            background: rgb(139, 164, 220);
+            margin-top: 5px;
+        }
+        .legend-item-text{
+            font:normal 8px "宋体",Arial;
+            padding: 3px 5px;
+            float: left;
+        }
+    </style>
+    <script src="http://localhost/arcgis_js_api/library/3.9/3.9/init.js"></script>
+    <script src="js/bj_sub_data.js"></script>
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script>
+        var map;
+        var color = ["#d92528","#166db2","#02a9bb","#b51c84","#bd9001","#ff9000","#17997d","#90ba78","#0696cb",
+            "#ffd600","#f55585","#714286","#00a9bc","#ca1e72","#ed9aac","#cd2c24","#eb5e19","#ac96bd"];
+        require([   "esri/map",
+                    "esri/layers/ArcGISTiledMapServiceLayer",
+                    "esri/layers/GraphicsLayer",
+                    "esri/graphic",
+                    "esri/geometry/Point",
+                    "esri/geometry/Multipoint",
+                    "esri/geometry/Polyline",
+                    "esri/SpatialReference",
+                    "esri/symbols/SimpleMarkerSymbol",
+                    "esri/symbols/PictureMarkerSymbol",
+                    "esri/symbols/SimpleLineSymbol", //简单线符号
+                    "dojo/_base/Color",
+                    "dojo/domReady!"
+                ],
+                function(Map,
+                         Tiled,
+                         GraphicsLayer,
+                         Graphic,
+                         Point,
+                         Multipoint,
+                         Polyline,
+                         SpatialReference,
+                         SimpleMarkerSymbol,
+                         PictureMarkerSymbol,
+                         SimpleLineSymbol,
+                         Color) {
+                    map = new Map("map",{
+                        logo:false
+                    });
+                    //显示地图坐标
+                    map.on('mouse-move', showCoordinates);
+                    map.on('mouse-drag', showCoordinates);
+                    //显示地图坐标
+                    function showCoordinates(evt) {
+                        var mp = evt.mapPoint;
+                        dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x.toFixed(4) + " , " + mp.y.toFixed(4);  //toFiex(2) 限制小数点后显示的位数
+                    }
+                    //var tiled = new Tiled("http://localhost:6080/arcgis/rest/services/BJ/MapServer",{"id":"tiled"});
+                    var tiled = new Tiled("http://60.29.110.104:6080/arcgis/rest/services/外业点位图map20151207/MapServer",{"id":"tiled"});
+                    map.addLayer(tiled);
+                    tiled.hide();
+                    var pt = new Point(116.88590597052463,40.37521501133166);
+                    //var pt = new Point(116,40);
+                    //map.centerAndZoom(pt, 8);
+                    map.centerAt(pt);
+
+                    var subwayStop = new GraphicsLayer({"id":"subwayStop"});
+                    var subwayLine = new GraphicsLayer({"id":"subwayLine"});
+                    var subwayLabel = new GraphicsLayer({"id":"subwayLabel"});
+                    map.addLayer(subwayLine);
+                    map.addLayer(subwayStop);
+                    map.addLayer(subwayLabel);
+                    subwayLabel.hide();
+
+                    map.on("zoom-end",function(){
+                        var level =map.getLevel();
+                        if(level>0){
+                            subwayLabel.show();
+                        }
+                        else{
+                            subwayLabel.hide();
+                        }
+                    });
+
+                    subwayStop.on("mouse-over",function(evt){
+                        var scrPt = map.toScreen(evt.graphic.geometry);
+                        var statName = evt.graphic.attributes.lb;
+                        var stopName = $("<div />").attr("id","stopName")
+                                .addClass("stat-name-box")
+                                .html(statName)
+                                .css("left",scrPt.x)
+                                .css("top",scrPt.y+20)
+                                .appendTo($("#map"));
+                        map.setMapCursor("pointer");
+                    });
+                    subwayStop.on("mouse-out",function(evt){
+                        $("#stopName").remove();
+                        map.setMapCursor("default");
+                    });
+                    subwayStop.on("click",function(evt){
+                        var stopName= evt.graphic.attributes.lb;
+                        var lineName = evt.graphic.attributes.ln;
+                        lineName = lineName.split(",");
+                        var title = "<span style='font-weight: bold;'>"+stopName+"</span>";
+                        var content="<span style='font-weight: bold;'>可乘坐</span>：<br />";
+                        for(var i=0;i<lineName.length;i++){
+                            var pathName = lineName[i].split("|")[1];
+                            content = content+pathName+"<br />";
+                        }
+                        map.infoWindow.setTitle(title);
+                        map.infoWindow.setContent(content);
+                        map.infoWindow.show(evt.graphic.geometry);
+                        $(".maximize").hide();
+                    });
+
+                    subwayLine.on("mouse-over",function(evt){
+                        var scrPt = map.toScreen(evt.mapPoint);
+                        var lineTitle = evt.graphic.attributes.lb;
+                        var lineName = $("<div />").attr("id","lineName")
+                                .addClass("stat-name-box")
+                                .html(lineTitle)
+                                .css("left",scrPt.x)
+                                .css("top",scrPt.y+20)
+                                .appendTo($("#map"));
+                        map.setMapCursor("pointer");
+                        evt.graphic.symbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                                new Color("#00ffff"),
+                                4
+                        );
+                        subwayLine.redraw();
+                    });
+                    subwayLine.on("mouse-out",function(evt){
+                        $("#lineName").remove();
+                        map.setMapCursor("default");
+                        evt.graphic.symbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                                new Color(color[evt.graphic.attributes.i-1]),
+                                4
+                        );
+                        subwayLine.redraw();
+                    });
+                    subwayLine.on("click",function(evt){
+                        var geometry = evt.graphic.geometry;
+
+                        var stops = evt.graphic.attributes.p;
+                        var startStop =stops[0],endStop=stops[stops.length-1];
+
+                        var scrStart = new esri.geometry.ScreenPoint(startStop.x,startStop.y);
+                        var scrEnd = new esri.geometry.ScreenPoint(endStop.x,endStop.y);
+                        var startPt = map.toMap(scrStart);
+                        var endPt = map.toMap(scrEnd);
+
+                        var startName = startStop.lb, endName = endStop.lb;
+                        var font  = new esri.symbol.Font();
+                        font.setSize("8pt");
+                        font.setFamily("微软雅黑");
+                        var startText = new esri.symbol.TextSymbol(startName);
+                        var endText = new esri.symbol.TextSymbol(endName);
+                        startText.setFont(font);
+                        endText.setFont(font);
+                        startText.setColor(new dojo.Color([0,0,0,100]));
+                        endText.setColor(new dojo.Color([0,0,0,100]));
+                        subwayLabel.add(new Graphic(startPt, startText));
+                        subwayLabel.add(new Graphic(endPt, endText));
+
+                        map.setExtent(geometry.getExtent().expand(1.8));
+                    });
+
+                    map.on("load",function(){
+                        var legendDiv = $("<div />").addClass("legend-box").appendTo($("#map"));
+                        var titleDiv = $("<div />").addClass("tr-title").appendTo(legendDiv).html("图例");
+                        var legendTab = $("<table />").appendTo(legendDiv).hide();
+
+                        titleDiv.on("click",function(){
+                            if(!legendTab.is(":hidden")){
+                                legendTab.hide();
+                            }
+                            else{
+                                legendTab.show();
+                            }
+                        });
+                        var mulPt = new Multipoint();
+                        var subLines = subData.sw.l;
+                        //console.log(subLines);
+                        for(var i= 0,ll =subLines.length;i<ll;i++){
+                            var sms = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE,
+                                    8,
+                                    new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                                            new Color(color[i]),
+                                            3
+                                    ),
+                                    new Color([255,255,255])
+                            );
+                            var pms = PictureMarkerSymbol('images/chg_stat.png', 12, 12);
+
+                            var sls = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                                    new Color(color[i]),
+                                    4
+                            );
+
+                            var trItem = $("<tr />").appendTo(legendTab);
+                            var legendColor = $("<div />").addClass("legend-item-color").css("background",color[i]);
+                            var legendText = $("<div />").addClass("legend-item-text").html(subLines[i].lid);
+                            var tdColor = $("<td />").appendTo(trItem).append(legendColor);
+                            var tdText = $("<td />").appendTo(trItem).append(legendText);
+
+                            //向地图添加点线，并显示出来
+                            var stops = subLines[i].p;
+                            var line = new Array();
+                            for(var j= 0,sl =stops.length;j<sl;j++){
+                                var scrPt = new esri.geometry.ScreenPoint(stops[j].x,stops[j].y);
+                                var mapPt = map.toMap(scrPt);
+                                mulPt.addPoint(mapPt);
+                                line.push([mapPt.x,mapPt.y]);
+
+                                if(stops[j].st==="true"){
+                                    var smb = sms;
+                                    var font  = new esri.symbol.Font();
+                                    font.setSize("10px");
+                                    font.setFamily("微软雅黑");
+
+                                    if(stops[j].ex==="true"){
+                                        smb = pms;
+                                        font.setWeight("bold");
+                                    }
+
+                                    var gStop = new Graphic(mapPt,smb,stops[j]);
+                                    subwayStop.add(gStop);
+                                    var ts = new esri.symbol.TextSymbol(stops[j].lb);
+                                    ts.setFont(font);
+                                    ts.setOffset(0,5);
+                                    var gTxtStop = new Graphic(mapPt,ts);
+                                    subwayLabel.add(gTxtStop);
+                                }
+                            }
+                            if(subLines[i].loop==="true"){
+                                var scrPt = new esri.geometry.ScreenPoint(stops[0].x,stops[0].y);
+                                var mapPt = map.toMap(scrPt);
+                                line.push([mapPt.x,mapPt.y]);
+                            }
+                            var subLine = new Polyline({"paths":[line],
+                                "spatialReference":{"wkid":102100}});
+                            var gLine = new Graphic(subLine,sls,subLines[i]);
+                            subwayLine.add(gLine);
+                        }
+                        var trItem = $("<tr />").appendTo(legendTab);
+                        var legendColor = $("<img />").attr("src","images/chg_stat.png").attr("width","15px").attr("height","15px");
+                        var legendText = $("<div />").addClass("legend-item-text").html("换乘站点");
+                        var tdColor = $("<td />").appendTo(trItem).append(legendColor);
+                        var tdText = $("<td />").appendTo(trItem).append(legendText);
+                        map.setExtent(mulPt.getExtent().expand(1.5));
+                    });
+                });
+    </script>
+</head>
+<body  class="claro">
+<div id="map">
+    <span id="XYinfo" style="background-color: none; font-weight: normal; font-size: smaller;color:#000; position: absolute; padding: 2px; left: 20px; bottom: 2px; z-index: 99;"></span>
+</div>
+
+</body>
+</html>

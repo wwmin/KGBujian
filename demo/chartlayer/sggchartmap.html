@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Simple Map</title>
+    <link rel="stylesheet" href="http://localhost/arcgis_js_api/library/3.9/3.9/js/dojo/dijit/themes/tundra/tundra.css">
+    <link rel="stylesheet" href="http://localhost/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css">
+    <style>
+        html, body, #map {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .chart {
+            width:100px;
+            height:100px;
+            padding:0px !important;
+        }
+    </style>
+    <script type="text/javascript">
+        var path = this.location.pathname.replace(/\/[^/]+$/, "");
+        var dojoConfig = {
+            parseOnLoad:true,
+            packages: [{
+                "name": "SggChart",
+                "location": path+"/sggchart"
+            }]
+        };
+    </script>
+    <script src="http://localhost/arcgis_js_api/library/3.9/3.9/init.js"></script>
+    <script>
+        var map, statesLayer, chartLayer;
+        require([
+            "esri/map",
+            "esri/layers/ArcGISTiledMapServiceLayer",
+            "esri/layers/FeatureLayer",
+            "esri/geometry/Point",
+            "esri/symbols/SimpleFillSymbol",
+            "esri/symbols/SimpleLineSymbol",
+            "esri/renderers/SimpleRenderer",
+            "SggChart/SggChartGraphics",
+            "SggChart/SggChartLayerForFeatureLayer",
+            "dojo/domReady!"],
+        function(Map,
+            Tiled,
+            FeatureLayer,
+            Point,
+            SimpleFillSymbol,
+            SimpleLineSymbol,
+            SimpleRenderer,
+            SggChartGraphics,
+            SggChartLayerForFeatureLayer
+        ){
+            map = new Map("map",{logo:false});
+            var tiled = new Tiled("http://localhost:6080/arcgis/rest/services/image/MapServer");
+            map.addLayer(tiled);
+            tiled.hide();
+            map.centerAndZoom(new Point(103.847, 36.0473, map.spatialReference),4);
+
+            statesLayer = new FeatureLayer("http://localhost:6080/arcgis/rest/services/china/MapServer/0",{
+                mode: FeatureLayer.MODE_SNAPSHOT,
+                outFields: ["*"]
+            });
+            statesLayer.setDefinitionExpression("NAME = '黑龙江' or Name='内蒙古' or Name='新疆' or Name='甘肃' or Name='西藏'");
+            var symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+                    new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                            new esri.Color([255, 0, 0]),
+                            2
+                    ),
+                    new esri.Color([100, 100, 100, 0])
+            );
+            statesLayer.setRenderer(new SimpleRenderer(symbol));
+
+            chartLayer =new sggchart.SggChartLayer({bindGraphicLayer:statesLayer, displayOnPan:false});
+            chartLayer.setDivId("chart");
+            map.addLayer(chartLayer);
+
+            var chartType = "Pie";
+            statesLayer.on("graphic-add",function(addGraphic){
+                var tmepchartgraphic=new sggchart.SggPieChart(addGraphic);
+                tmepchartgraphic.setId("id"+addGraphic.graphic.attributes.DZM);
+                tmepchartgraphic.setChartType(chartType);
+                var att = tmepchartgraphic.bindGraphic.graphic.attributes;
+                tmepchartgraphic.setSeries(series);
+                var series=[att.Pop_Rural, att.Pop_Urban, att.Pop_Female];
+                tmepchartgraphic.setSeries(series);
+                chartLayer.add(tmepchartgraphic);
+            });
+            map.addLayer(statesLayer);
+        });
+    </script>
+</head>
+
+<body class="tundra">
+<div id="map"></div>
+<div id="chart"></div>
+</body>
+</html>
