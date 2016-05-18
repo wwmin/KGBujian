@@ -190,25 +190,25 @@
 
 
               //add the snapping checkbox to the editor's toolbar 
-              var myToolbarElement = query(".esriDrawingToolbar", editorWidget.domNode)[0];
-              var myToolbar = registry.byId(myToolbarElement.id);
-
-              myToolbar.addChild(new ToolbarSeparator());
-              myToolbar.addChild(checkBox);
+              // var myToolbarElement = query(".esriDrawingToolbar", editorWidget.domNode)[0];
+              // var myToolbar = registry.byId(myToolbarElement.id);
+              //
+              // myToolbar.addChild(new ToolbarSeparator());
+              // myToolbar.addChild(checkBox);
 
               editorWidget.startup();
 
               //listen for the template pickers onSelectionChange and disable
               //the snapping checkbox when a template is selected
-              var templatePickerElement = query(".esriTemplatePicker", editorWidget.domNode)[0];
-              var templatePicker = registry.byId(templatePickerElement.id);
-              templatePicker.on("selection-change", function () {
-                  if (templatePicker.getSelected()) {
-                      registry.byId('chkSnapping').set("disabled", true);
-                  } else {
-                      registry.byId('chkSnapping').set("disabled", false);
-                  }
-              });
+              // var templatePickerElement = query(".esriTemplatePicker", editorWidget.domNode)[0];
+              // var templatePicker = registry.byId(templatePickerElement.id);
+              // templatePicker.on("selection-change", function () {
+              //     if (templatePicker.getSelected()) {
+              //         registry.byId('chkSnapping').set("disabled", true);
+              //     } else {
+              //         registry.byId('chkSnapping').set("disabled", false);
+              //     }
+              // });
               map.infoWindow.resize(325, 200);
           }
           ////////////////////////////////////////////////////////--------右侧功能区---------///////////////////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@
           //显示地图坐标
           function showCoordinates(evt) {
               var mp = evt.mapPoint;
-              dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x.toFixed(4) + " , " + mp.y.toFixed(4);  //toFiex(2) 限制小数点后显示的位数
+              dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x + " , " + mp.y;  //toFiex(2) 限制小数点后显示的位数
           }
           map.on("key-down", function (e) {
               if (e.keyCode == 27) {
@@ -649,4 +649,19 @@
               drawTable();
           }
 
+          var vueMain=new Vue({
+              el:"#SearchMap",
+              data:{
+                  searchByYear:""
+              },
+              ready:function(){
+                  var t=new Date();
+                  this.searchByYear=t.getFullYear();
+              },
+              methods:{
+                  btnSearch:function(){
+                      console.log("vue成功了")
+                  }
+              }
+          })
       });
