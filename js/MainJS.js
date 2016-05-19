@@ -299,20 +299,71 @@
 
           function setGridHeader() {
               var layout = [
-                  //{ field: 'OBJECTID', name: '标识ID', width: "50px", headerStyles: "text-align:center;" },
-                  { field: 'TYPE', name: '类型', width: "48px", headerStyles: "text-align:center;" },
+                  // { field: 'OBJECTID', name: '标识ID', width: "50px", headerStyles: "text-align:center;" },
+                  { field: 'Type', name: '类型', width: "48px", headerStyles: "text-align:center;" },
                   { field: 'Material', name: '材质', width: "48px", headerStyles: "text-align:center;" },
-                  { field: 'CRDate', name: '时间', width: "48px", headerStyles: "text-align:center;" },
-                  { field: 'ROAD_LANE', name: '道路名', width: "48px", headerStyles: "text-align:center;" },
-                  { field: 'Remark', name: '备注', width: "48px", headerStyles: "text-align:center;" }
+                  { field: 'CRDate', name: '时间', width: "72px", headerStyles: "text-align:center;" },
+                  { field: 'ROAD_LANE', name: '道路名', width: "80px", headerStyles: "text-align:center;" }
+                  // { field: 'Remark', name: '备注', width: "100px", headerStyles: "text-align:center;" }
               ];
               gridWidget.setStructure(layout);
           }
+          // var unixTimestamp = new Date(item * 1000);
+          //  var commonTime = unixTimestamp.toLocaleString();
           //Draw a dojox table using an array as input
           function drawTable(features) {
               var items = []; //all items to be stored in data store
               //items = dojo.map(features, function(feature) {return feature.attributes});
               items = array.map(features, "return item.attributes");
+              console.log(items);
+              //将时间戳转换为常规时间
+              //将type number类型转换为具体名称,以便显示
+              for(var i=0;i<items.length;i++){
+                  var unixTimestamp = new Date(items[i].CRDate);
+                  items[i].CRDate=unixTimestamp.getFullYear()+"/"+(unixTimestamp.getMonth()+1)+"/"+unixTimestamp.getDate();
+                  switch (items[i].Type)
+                  {
+                      case 1:
+                          items[i].Type="垃圾箱";
+                          break;
+                      case 2:
+                          items[i].Type="路名牌";
+                          break;
+                      case 3:
+                          items[i].Type="挡车桩";
+                          break;
+                      case 4:
+                          items[i].Type="公交站亭";
+                          break;
+                      case 5:
+                          items[i].Type="公交站牌";
+                          break;
+                      case 6:
+                          items[i].Type="不锈钢垃圾箱";
+                          break;
+                      case 7:
+                          items[i].Type="企业指示牌";
+                          break;
+                      case 8:
+                          items[i].Type="路边座椅";
+                          break;
+                      case 9:
+                          items[i].Type="湖区座椅";
+                          break;
+                      case 10:
+                          items[i].Type="河道警示牌";
+                          break;
+                      case 11:
+                          items[i].Type="西湖牌匾";
+                          break;
+                      case 12:
+                          items[i].Type="钓鱼牌";
+                          break;
+                      case 13:
+                          items[i].Type="水域护栏";
+                          break;
+                  }
+              }
               //Create data object to be used in store
               var data = {
                   identifier: "OBJECTID",  //This field needs to have unique values
@@ -582,7 +633,8 @@
               var features = fset.features;
               var Month1 = 0, Month2 = 0, Month3 = 0, Month4 = 0, Month5 = 0, Month6 = 0, Month7 = 0, Month8 = 0, Month9 = 0, Month10 = 0, Month11 = 0, Month12 = 0, Other = 0;
               for (var x = 0; x < features.length; x++) {
-                  switch (Number(features[x].attributes['MONTH'])) {
+                  var time=new Date(features[x].attributes['CRDate']);
+                  switch (Number(time.getMonth()+1)) {
                       case 1:
                           Month1 += 1;
                           break;
@@ -684,7 +736,7 @@
               dojo.byId('Span12').innerHTML = "";
               dojo.byId('totalPopulation').innerHTML = "";
               dojo.byId('Other').innerHTML = "";
-              document.getElementById('type0').innerHTML = "";
+              // document.getElementById('type0').innerHTML = "";
               document.getElementById('type1').innerHTML = "";
               document.getElementById('type2').innerHTML = "";
               document.getElementById('type3').innerHTML = "";
