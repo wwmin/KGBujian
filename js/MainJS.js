@@ -480,6 +480,13 @@
                     // map.graphics.add(graphic);
                     SearchLayer.add(graphic);
                     resultFeaturesFilter.push(graphic);
+                }else if(searchYear==""){
+                    var graphic = resultFeatures[i];
+                    //Assign a symbol sized based on populuation
+                    setTheSymbol(graphic);
+                    // map.graphics.add(graphic);
+                    SearchLayer.add(graphic);
+                    resultFeaturesFilter.push(graphic);
                 }
             }
             drawTable(resultFeaturesFilter);
@@ -694,6 +701,47 @@
                         default:
                             Other += 1;
                     }
+                }else if(document.getElementById("searchYear").value==""){
+                    switch (Number(time.getMonth() + 1)) {
+                        case 1:
+                            Month1 += 1;
+                            break;
+                        case 2:
+                            Month2 += 1;
+                            break;
+                        case 3:
+                            Month3 += 1;
+                            break;
+                        case 4:
+                            Month4 += 1;
+                            break;
+                        case 5:
+                            Month5 += 1;
+                            break;
+                        case 6:
+                            Month6 += 1;
+                            break;
+                        case 7:
+                            Month7 += 1;
+                            break;
+                        case 8:
+                            Month8 += 1;
+                            break;
+                        case 9:
+                            Month9 += 1;
+                            break;
+                        case 10:
+                            Month10 += 1;
+                            break;
+                        case 11:
+                            Month11 += 1;
+                            break;
+                        case 12:
+                            Month12 += 1;
+                            break;
+                        default:
+                            Other += 1;
+                    }
                 }
             }
             return Month1 + "," + Month2 + "," + Month3 + "," + Month4 + "," + Month5 + "," + Month6 + "," + Month7 + "," + Month8 + "," + Month9 + "," + Month10 + "," + Month11 + "," + Month12 + "," + Other;
@@ -707,8 +755,6 @@
             console.log(clickedId);
             var graphic;
             for (var i = 0, il = SearchLayer.graphics.length; i < il; i++) {
-
-
                 var currentGraphic = SearchLayer.graphics[i];
                 console.log(currentGraphic);
                 if ((currentGraphic.attributes) && currentGraphic.attributes.OBJECTID == clickedId) {
