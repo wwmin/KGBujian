@@ -253,7 +253,7 @@
         setGridHeader();
 
         var symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT, new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
-        var pntSym1 = new PictureMarkerSymbol("images/CircleBlue16.png", 16, 16);
+        var pntSym1 = new PictureMarkerSymbol("images/CircleRed32.png", 16, 16);
         var pntSym2 = new PictureMarkerSymbol("images/CircleBlue24.png", 18, 18);
         var pntSym3 = new PictureMarkerSymbol("images/CircleRed32.png", 25, 25);
 
@@ -485,7 +485,7 @@
             drawTable(resultFeaturesFilter);
             var total = sumPopulation(evt.featureSet);
 
-            var r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, Other;
+            var r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12;
             var s = total.split(',');
             r1 = s[0];
             r2 = s[1];
@@ -499,7 +499,6 @@
             r10 = s[9];
             r11 = s[10];
             r12 = s[11];
-            Other = s[12];
 
             document.getElementById('totalPopulation').innerHTML = resultFeaturesFilter.length;
             document.getElementById('Span1').innerHTML = r1;
@@ -514,7 +513,6 @@
             document.getElementById('Span10').innerHTML = r10;
             document.getElementById('Span11').innerHTML = r11;
             document.getElementById('Span12').innerHTML = r12;
-            document.getElementById('Other').innerHTML = Other;
         }
 
         registry.forEach(function (d) {
