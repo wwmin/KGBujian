@@ -94,7 +94,7 @@
         map.addLayer(SearchLayer);
         //创建临时图形图层,为Table点击生成临时高亮点，容易清理
         var TempLayer = new GraphicsLayer();
-        map.addLayer(TempLayer, 2);
+        map.addLayer(TempLayer, 4);
         map.on("layers-add-result", initEditor);
         //dojo.keys.copyKey maps to CTRL on windows and Cmd on Mac., but has wrong code for Chrome on Mac
         var snapManager = map.enableSnapping({
@@ -253,7 +253,7 @@
         setGridHeader();
 
         var symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT, new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
-        var pntSym1 = new PictureMarkerSymbol("images/CircleRed32.png", 16, 16);
+        var pntSym1 = new PictureMarkerSymbol("images/CircleBlue16.png", 16, 16);
         var pntSym2 = new PictureMarkerSymbol("images/CircleBlue24.png", 18, 18);
         var pntSym3 = new PictureMarkerSymbol("images/CircleRed32.png", 25, 25);
 
@@ -704,9 +704,13 @@
         //On row click
         function onTableRowClick(evt) {
             var clickedId = gridWidget.getItem(evt.rowIndex).OBJECTID;
+            console.log(clickedId);
             var graphic;
-            for (var i = 0, il = map.graphics.graphics.length; i < il; i++) {
-                var currentGraphic = map.graphics.graphics[i];
+            for (var i = 0, il = SearchLayer.graphics.length; i < il; i++) {
+
+
+                var currentGraphic = SearchLayer.graphics[i];
+                console.log(currentGraphic);
                 if ((currentGraphic.attributes) && currentGraphic.attributes.OBJECTID == clickedId) {
                     graphic = currentGraphic;
                     break;
@@ -721,14 +725,13 @@
             setMapCenter(graphic, 8);
 
             TempLayer.clear();
-            SearchLayer.clear();
             var loc = new Point(graphic.geometry.x, graphic.geometry.y, new SpatialReference(map.spatialReference));
             var attr = currentGraphic.attributes;
             //var infoTemplate = new InfoTemplate("${TYPE}", "${CID}", "${NUM}");
             //var gc = new Graphic(loc, pntSym3, attr, infoTemplate);
             var gc = new Graphic(loc, pntSym3, attr);
             TempLayer.add(gc);
-            gc.setSymbol(pntSym3);
+            // gc.setSymbol(pntSym2);
         }
 
         //将点平移到map正中 (并 缩放到指定map级别)
@@ -781,19 +784,19 @@
             drawTable();
         }
 
-        var vueMain = new Vue({
-            el: "#SearchMap",
-            data: {
-                searchByYear: ""
-            },
-            ready: function () {
-                var t = new Date();
-                this.searchByYear = t.getFullYear();
-            },
-            methods: {
-                btnSearch: function () {
-                    console.log("vue成功了");
-                }
-            }
-        })
+        // var vueMain = new Vue({
+        //     el: "#SearchMap",
+        //     data: {
+        //         searchByYear: ""
+        //     },
+        //     ready: function () {
+        //         var t = new Date();
+        //         this.searchByYear = t.getFullYear();
+        //     },
+        //     methods: {
+        //         btnSearch: function () {
+        //             console.log("vue成功了");
+        //         }
+        //     }
+        // })
     });

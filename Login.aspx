@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head runat="server">
-    <title>空港计量</title>
+    <title>空港部件统计网</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no"; charset="utf-8"/>
     <!-- Bootstrap -->
     <!--<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">-->
@@ -46,7 +46,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4 panel panel-default">
-            <h1 class="margin-base-vertical text-center">欢迎登陆空港计量</h1>
+            <h1 class="margin-base-vertical text-center">欢迎登陆空港部件统计网</h1>
 
             <form action="" method="post" class="margin-base-vertical" runat="server">
                 <p class="input-group">
