@@ -68,9 +68,9 @@
                         <button data-dojo-type="dijit/form/Button" title="清空查找结果，快捷键ESC">清空</button>
                     </div>
 
-                    <div style="padding-bottom: 10px;">
-                        <input type="number" placeholder="按年份查询" v-model="searchByYear">
-                        <button type="button" @click="btnSearch">查询</button>
+                    <div style="padding: 8px 2px 10px 2px;">
+                        <span>查询日期为:</span><input type="number" placeholder="按年份查询" v-model="searchByYear" id="searchYear" style="width: auto;"><span>年</span>
+                        <!--<button type="button" @click="btnSearch">查询</button>-->
                     </div>
                     <table class="tblist">
                         <tr>
@@ -135,10 +135,9 @@
                 <div class="Dislist">
                     <span>类型列表</span>
                     <div id="box">
-                        <div class="numSum">总数为：<span id="totalPopulation"></span>,其中月份有误个数：<span id="Other"></span>
+                        <div class="numSum">总数为：<span id="totalPopulation"></span>
                         </div>
-                        <ul style="float:left;">
-                            <!--<li>0-侧石<span id="type0">&nbsp;</span></li>-->
+                        <ul>
                             <li>1-垃圾箱<span id="type1">&nbsp;</span></li>
                             <li>2-路名牌<span id="type2">&nbsp;</span></li>
                             <li>3-挡车桩<span id="type3">&nbsp;</span></li>
@@ -146,9 +145,6 @@
                             <li>5-公交站牌<span id="type5">&nbsp;</span></li>
                             <li>6-不锈钢垃圾箱<span id="type6">&nbsp;</span></li>
                             <li>7-企业指示牌<span id="type7">&nbsp;</span></li>
-                        </ul>
-                        <ul style="float: right;">
-                            <!--<li>0-侧石<span id="type0">&nbsp;</span></li>-->
                             <li>8-路边座椅<span id="type8">&nbsp;</span></li>
                             <li>9-湖区座椅<span id="type9">&nbsp;</span></li>
                             <li>10-河道警示牌<span id="type10">&nbsp;</span></li>
@@ -156,11 +152,6 @@
                             <li>12-钓鱼牌<span id="type12">&nbsp;</span></li>
                             <li>13-水域护栏<span id="type13">&nbsp;</span></li>
                         </ul>
-                        <table>
-                            <tr>
-                                <td></td>
-                            </tr>
-                        </table>
                     </div>
                 </div>
             </div>
