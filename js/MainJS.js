@@ -490,8 +490,9 @@
                 }
             }
             drawTable(resultFeaturesFilter);
-            var total = sumPopulation(evt.featureSet);
 
+            var total = sumPopulation(evt.featureSet);
+            showResultMon(evtResult,0);
             var r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12;
             var s = total.split(',');
             r1 = s[0];
@@ -531,11 +532,9 @@
             var tool = null;
             switch (this.label) {
                 case "1月":
-                    removeTable();
                     showResultMon(evtResult, 0);
                     break;
                 case "2月":
-                    removeTable();
                     showResultMon(evtResult, 1);
                     break;
                 case "3月":
@@ -568,10 +567,14 @@
                 case "12月":
                     showResultMon(evtResult, 11);
                     break;
+                default:
+                    removeTable();
+                    break;
             }
         }
 
         function showResultMon(evtResult, MonNum) {
+            removeSum();
             //var resultFeatures = evt.featureSet.features;
             var resultFeaturesMon = [];
             var j = 0;
@@ -580,7 +583,11 @@
                 var time = new Date(evtResult[i].attributes['CRDate']);//将unix时间转为常规时间
                 if (time.getMonth() == MonNum) {
                     resultFeaturesMon[j++] = evtResult[i];
-                    switch (evtResult[i].attributes['Type'][0]) {
+                    switchResult(evtResult[i].attributes['Type'][0]);
+                    console.log(time.getMonth());
+                    console.log(evtResult[i].attributes['Type'][0]);
+                    console.log(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13);
+                    /*switch (evtResult[i].attributes['Type'][0]) {
                         case "垃圾箱":
                             t1 += 1;
                             break;
@@ -622,22 +629,71 @@
                             break;
                         default :
                             break;
-                    }
+                    }*/
+                }else if(MonNum==0){
+                    resultFeaturesMon[j++] = evtResult[i];
+                    switchResult(evtResult[i].attributes['Type'][0]);
+                    console.log(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13);
                 }
             }
-            document.getElementById('type1').innerHTML = "   " + t1 + "个";
-            document.getElementById('type2').innerHTML = "   " + t2 + "个";
-            document.getElementById('type3').innerHTML = "   " + t3 + "个";
-            document.getElementById('type4').innerHTML = "   " + t4 + "个";
-            document.getElementById('type5').innerHTML = "   " + t5 + "个";
-            document.getElementById('type6').innerHTML = "   " + t6 + "个";
-            document.getElementById('type7').innerHTML = "   " + t7 + "个";
-            document.getElementById('type8').innerHTML = "   " + t8 + "个";
-            document.getElementById('type9').innerHTML = "   " + t9 + "个";
-            document.getElementById('type10').innerHTML = "   " + t10 + "个";
-            document.getElementById('type11').innerHTML = "   " + t11 + "个";
-            document.getElementById('type12').innerHTML = "   " + t12 + "个";
-            document.getElementById('type13').innerHTML = "   " + t13 + "个";
+            function switchResult(att){
+                switch (att) {
+                    case "垃圾箱":
+                        t1 += 1;
+                        break;
+                    case "路名牌":
+                        t2 += 1;
+                        break;
+                    case "挡车桩":
+                        t3 += 1;
+                        break;
+                    case "公交站亭":
+                        t4 += 1;
+                        break;
+                    case "公交站牌":
+                        t5 += 1;
+                        break;
+                    case "不锈钢垃圾箱":
+                        t6 += 1;
+                        break;
+                    case "企业指示牌":
+                        t7 += 1;
+                        break;
+                    case "路边座椅":
+                        t8 += 1;
+                        break;
+                    case "湖区座椅":
+                        t9 += 1;
+                        break;
+                    case "河道警示牌":
+                        t10 +=1;
+                        break;
+                    case "西湖牌匾":
+                        t11+=1;
+                        break;
+                    case "钓鱼牌":
+                        t12+=1;
+                        break;
+                    case "水域护栏":
+                        t13+=1;
+                        break;
+                    default :
+                        break;
+                }
+            }
+            if(t1==0){}else{document.getElementById('type1').innerHTML = "   " + t1 + "个";}
+            if(t2==0){}else{document.getElementById('type2').innerHTML = "   " + t2 + "个";}
+            if(t3==0){}else{document.getElementById('type3').innerHTML = "   " + t3 + "个";}
+            if(t4==0){}else{document.getElementById('type4').innerHTML = "   " + t4 + "个";}
+            if(t5==0){}else{document.getElementById('type5').innerHTML = "   " + t5 + "个";}
+            if(t6==0){}else{document.getElementById('type6').innerHTML = "   " + t6 + "个";}
+            if(t7==0){}else{document.getElementById('type7').innerHTML = "   " + t7 + "个";}
+            if(t8==0){}else{document.getElementById('type8').innerHTML = "   " + t8 + "个";}
+            if(t9==0){}else{document.getElementById('type9').innerHTML = "   " + t9 + "个";}
+            if(t10==0){}else{document.getElementById('type10').innerHTML = "   " + t10 + "个";}
+            if(t11==0){}else{document.getElementById('type11').innerHTML = "   " + t11 + "个";}
+            if(t12==0){}else{document.getElementById('type12').innerHTML = "   " + t12 + "个";}
+            if(t13==0){}else{document.getElementById('type13').innerHTML = "   " + t13 + "个";}
             drawTable(resultFeaturesMon);
         }
 
@@ -807,7 +863,6 @@
             dojo.byId('Span11').innerHTML = "";
             dojo.byId('Span12').innerHTML = "";
             dojo.byId('totalPopulation').innerHTML = "";
-            // document.getElementById('type0').innerHTML = "";
             document.getElementById('type1').innerHTML = "";
             document.getElementById('type2').innerHTML = "";
             document.getElementById('type3').innerHTML = "";
@@ -828,6 +883,22 @@
             TempLayer.clear();
             SearchLayer.clear();
             drawTable();
+        }
+        function removeSum(){
+            // dojo.byId('totalPopulation').innerHTML = "";
+            document.getElementById('type1').innerHTML = "";
+            document.getElementById('type2').innerHTML = "";
+            document.getElementById('type3').innerHTML = "";
+            document.getElementById('type4').innerHTML = "";
+            document.getElementById('type5').innerHTML = "";
+            document.getElementById('type6').innerHTML = "";
+            document.getElementById('type7').innerHTML = "";
+            document.getElementById('type8').innerHTML = "";
+            document.getElementById('type9').innerHTML = "";
+            document.getElementById('type10').innerHTML = "";
+            document.getElementById('type11').innerHTML = "";
+            document.getElementById('type12').innerHTML = "";
+            document.getElementById('type13').innerHTML = "";
         }
 
         // var vueMain = new Vue({
