@@ -84,11 +84,6 @@ if(zero == false ){
     //执行了...
 }
 
-
-
-
-
-
 (function(){
     console.log("闭包函数,并且加了()后,该函数是自执行");
     blogModule.addTopic="是这样赋值吗?-";
