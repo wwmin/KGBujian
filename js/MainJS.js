@@ -263,7 +263,7 @@
         var queryTask;
         var query = new QueryT(); //todo:解决冲突
         query.returnGeometry = true;
-        query.outFields = ["OBJECTID", "Type", "CRDate", "Material", "DISTRICT", "ROAD_LANE"];
+        query.outFields = ["OBJECTID", "Num","Type", "CRDate", "Material", "ROAD_LANE"];
 
         function activateTool() {
             var tool = null;
@@ -306,8 +306,9 @@
         function setGridHeader() {
             var layout = [
                 // { field: 'OBJECTID', name: '标识ID', width: "50px", headerStyles: "text-align:center;" },
-                {field: 'Type', name: '类型', width: "48px", headerStyles: "text-align:center;"},
-                {field: 'Material', name: '材质', width: "48px", headerStyles: "text-align:center;"},
+                {field: 'Num', name: '序号', width: "36px", headerStyles: "text-align:center;"},
+                {field: 'Type', name: '类型', width: "60px", headerStyles: "text-align:center;"},
+                // {field: 'Material', name: '材质', width: "48px", headerStyles: "text-align:center;"},
                 {field: 'CRDate', name: '时间', width: "72px", headerStyles: "text-align:center;"},
                 {field: 'ROAD_LANE', name: '道路名', width: "80px", headerStyles: "text-align:center;"}
                 // { field: 'Remark', name: '备注', width: "100px", headerStyles: "text-align:center;" }
