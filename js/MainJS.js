@@ -318,6 +318,7 @@
 
         //Draw a dojox table using an array as input
         function drawTable(features) {
+            console.log(features);
             var items = []; //all items to be stored in data store
             //items = dojo.map(features, function(feature) {return feature.attributes});
             items = array.map(features, "return item.attributes");
@@ -465,6 +466,7 @@
         }
 
         var evtResult;  //用于临时保存空间查询出来的数据，以便后续二次操作
+        var evtFileters;//过滤后的空间数据
         function showResult(evt) {
             var resultFeatures = evt.featureSet.features;
             evtResult = resultFeatures;
@@ -490,10 +492,11 @@
                     resultFeaturesFilter.push(graphic);
                 }
             }
+            evtFileters=resultFeaturesFilter;
             drawTable(resultFeaturesFilter);
-
+            console.log(resultFeaturesFilter);
             var total = sumPopulation(evt.featureSet);
-            showResultMon(evtResult,0);
+            showResultMon(resultFeaturesFilter,-1);
             var r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12;
             var s = total.split(',');
             r1 = s[0];
@@ -533,40 +536,40 @@
             var tool = null;
             switch (this.label) {
                 case "1月":
-                    showResultMon(evtResult, 0);
+                    showResultMon(evtFileters, 0);
                     break;
                 case "2月":
-                    showResultMon(evtResult, 1);
+                    showResultMon(evtFileters, 1);
                     break;
                 case "3月":
-                    showResultMon(evtResult, 2);
+                    showResultMon(evtFileters, 2);
                     break;
                 case "4月":
-                    showResultMon(evtResult, 3);
+                    showResultMon(evtFileters, 3);
                     break;
                 case "5月":
-                    showResultMon(evtResult, 4);
+                    showResultMon(evtFileters, 4);
                     break;
                 case "6月":
-                    showResultMon(evtResult, 5);
+                    showResultMon(evtFileters, 5);
                     break;
                 case "7月":
-                    showResultMon(evtResult, 6);
+                    showResultMon(evtFileters, 6);
                     break;
                 case "8月":
-                    showResultMon(evtResult, 7);
+                    showResultMon(evtFileters, 7);
                     break;
                 case "9月":
-                    showResultMon(evtResult, 8);
+                    showResultMon(evtFileters, 8);
                     break;
                 case "10月":
-                    showResultMon(evtResult, 9);
+                    showResultMon(evtFileters, 9);
                     break;
                 case "11月":
-                    showResultMon(evtResult, 10);
+                    showResultMon(evtFileters, 10);
                     break;
                 case "12月":
-                    showResultMon(evtResult, 11);
+                    showResultMon(evtFileters, 11);
                     break;
                 default:
                     removeTable();
@@ -588,50 +591,7 @@
                     console.log(time.getMonth());
                     console.log(evtResult[i].attributes['Type'][0]);
                     console.log(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13);
-                    /*switch (evtResult[i].attributes['Type'][0]) {
-                        case "垃圾箱":
-                            t1 += 1;
-                            break;
-                        case "路名牌":
-                            t2 += 1;
-                            break;
-                        case "挡车桩":
-                            t3 += 1;
-                            break;
-                        case "公交站亭":
-                            t4 += 1;
-                            break;
-                        case "公交站牌":
-                            t5 += 1;
-                            break;
-                        case "不锈钢垃圾箱":
-                            t6 += 1;
-                            break;
-                        case "企业指示牌":
-                            t7 += 1;
-                            break;
-                        case "路边座椅":
-                            t8 += 1;
-                            break;
-                        case "湖区座椅":
-                            t9 += 1;
-                            break;
-                        case "河道警示牌":
-                            t10 +=1;
-                            break;
-                        case "西湖牌匾":
-                            t11+=1;
-                            break;
-                        case "钓鱼牌":
-                            t12+=1;
-                            break;
-                        case "水域护栏":
-                            t13+=1;
-                            break;
-                        default :
-                            break;
-                    }*/
-                }else if(MonNum==0){
+                }else if(MonNum==-1){
                     resultFeaturesMon[j++] = evtResult[i];
                     switchResult(evtResult[i].attributes['Type'][0]);
                     console.log(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13);
