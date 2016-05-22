@@ -1,20 +1,29 @@
 /**
  * Created by wwm on 2016/5/21.
  */
-// function add(){
-//     return "wwmin";
-// }
-// var myAdd=function(x,y){
-//     return x+y;
-// };
-
-function add(x:number,y:number):string{
-    return x+y+"";
+function add(x,y){
+    return x+y+z;
 }
-var myAdd=function(x:number,y:string):string{
-    return "Hello TypeScript "+x+y;
-};
-console.log(myAdd(1,"wwmin"));
-var myAddts:(name:string,age:number)=>number=function(n:string,a:number):number{
-    return a;
-};
+let myAdd=function(x,y){return x+y;};
+let x=10;
+let y=50;
+let z=100;
+function addToz(x,y){
+    return x+y+this.x;
+}
+console.log(addToz(1,2));
+function add1(x:number,y:number):number{
+    return x+y;
+}
+let myAdd1=function(x:number,y:number):number{return x+y;};
+let myAdd2:(x:number,y:number)=>number=function(x:number,y:number):number{return x+y;};
+function buildName(firstName:string,lastName?:string){
+    if(lastName) return firstName+" "+lastName;
+    else return firstName;
+}
+let result1=buildName("Bob");
+let result2=buildName("Bob","Adams");
+function buildName2(firstName:string,lastName="min"){
+    return firstName+" "+lastName;
+}
+let result3=buildName2("Bob"); //Bob min
