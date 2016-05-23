@@ -1,8 +1,8 @@
-﻿require(["dojo/dom", "dojo/parser", "dijit/registry", "esri/config", "esri/sniff", 'dojo/on', "esri/map", "esri/layers/ArcGISTiledMapServiceLayer", "esri/layers/FeatureLayer", "esri/tasks/GeometryService", "esri/units", "esri/geometry/Extent", "esri/SpatialReference", "esri/InfoTemplate", "esri/graphic", "esri/layers/GraphicsLayer", "esri/toolbars/draw",
+﻿require(["dojo/dom", "dojo/parser", "dijit/registry", "esri/config", "esri/sniff", 'dojo/on', "esri/map", "esri/layers/ArcGISTiledMapServiceLayer","esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "esri/tasks/GeometryService", "esri/units", "esri/geometry/Extent", "esri/SpatialReference", "esri/InfoTemplate", "esri/graphic", "esri/layers/GraphicsLayer", "esri/toolbars/draw",
         "esri/symbols/PictureMarkerSymbol", "esri/renderers/SimpleRenderer", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/Color", "esri/dijit/editing/Editor", "esri/dijit/Print", "esri/dijit/AttributeInspector", "esri/tasks/QueryTask", "esri/tasks/query", "dojo/query", "dojo/_base/array", "dojo/data/ItemFileReadStore",
         "esri/geometry/Polygon", "esri/geometry/Point", "dijit/form/CheckBox", "dojo/keys", "dijit/ToolbarSeparator", "esri/dijit/HomeButton", "esri/dijit/LocateButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar", "esri/SnappingManager", "esri/dijit/Measurement",
         "dojox/grid/DataGrid", "dijit/TitlePane", "dijit/form/Button", "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dijit/layout/AccordionContainer", "dojo/domReady!"],
-    function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
+    function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer,FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
               PictureMarkerSymbol, SimpleRenderer, SimpleLineSymbol, SimpleFillSymbol, Color, Editor, Print, AttributeInspector, QueryTask, QueryT, query, array, ItemFileReadStore,
               Polygon, Point, CheckBox, keys, ToolbarSeparator, HomeButton, LocateButton, OverviewMap, Scalebar, SnappingManager, Measurement) {
         parser.parse();
@@ -32,9 +32,9 @@
             attachTo: "bottom-right", //放置位置
             color: "#D84E13", //设置颜色
             opacity: .40,  //透明度
-            visible: false,  //初始化是否可见
-            width: 250,  //默认值是地图高度的 1/4th
-            height: 210,  // 默认值是地图高度的 1/4th
+            visible: true,  //初始化是否可见
+            width: 200,  //默认值是地图高度的 1/4th
+            height: 140,  // 默认值是地图高度的 1/4th
             //maximizeButton:true,   // 最大化,最小化按钮，默认false
             expandFactor: 2.5 //概览地图和总览图上显示的程度矩形的大小之间的比例。默认值是2，这意味着概览地图将至少是两倍的大小的程度矩形。
         });
@@ -54,6 +54,15 @@
         var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL);
         map.addLayer(agoLayer);
 
+        //添加详细地块及项目名称图层 --动态图层
+        var urlDyn = "http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计地形图及项目/MapServer";
+        var baseDyn = new ArcGISDynamicMapServiceLayer(urlDyn, {
+            id: "base_road_name",
+            opacity: 0.95,
+            visible: true
+        });
+        baseDyn.setVisibleLayers([0,1]);
+        map.addLayer(baseDyn);
 
 
         // var baseUrl = "http://60.29.110.104:6080/arcgis/rest/services/FeatureMap20151208/FeatureServer/"; //此图层只有层  ?
@@ -104,6 +113,8 @@
             layer: parcelsLayer
         }];
         snapManager.setLayerInfos(layerInfos);
+
+
 
         var measurement = new Measurement({
             map: map,
@@ -861,6 +872,8 @@
             document.getElementById('type12').innerHTML = "";
             document.getElementById('type13').innerHTML = "";
         }
+
+
 
         // var vueMain = new Vue({
         //     el: "#SearchMap",
