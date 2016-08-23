@@ -1,8 +1,8 @@
-﻿require(["dojo/dom", "dojo/parser", "dijit/registry", "esri/config", "esri/sniff", 'dojo/on', "esri/map", "esri/layers/ArcGISTiledMapServiceLayer","esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "esri/tasks/GeometryService", "esri/units", "esri/geometry/Extent", "esri/SpatialReference", "esri/InfoTemplate", "esri/graphic", "esri/layers/GraphicsLayer", "esri/toolbars/draw",
+﻿require(["dojo/dom", "dojo/parser", "dijit/registry", "esri/config", "esri/sniff", 'dojo/on', "esri/map", "esri/layers/ArcGISTiledMapServiceLayer", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "esri/tasks/GeometryService", "esri/units", "esri/geometry/Extent", "esri/SpatialReference", "esri/InfoTemplate", "esri/graphic", "esri/layers/GraphicsLayer", "esri/toolbars/draw",
         "esri/symbols/PictureMarkerSymbol", "esri/renderers/SimpleRenderer", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/Color", "esri/dijit/editing/Editor", "esri/dijit/Print", "esri/dijit/AttributeInspector", "esri/tasks/QueryTask", "esri/tasks/query", "dojo/query", "dojo/_base/array", "dojo/data/ItemFileReadStore",
         "esri/geometry/Polygon", "esri/geometry/Point", "dijit/form/CheckBox", "dojo/keys", "dijit/ToolbarSeparator", "esri/dijit/HomeButton", "esri/dijit/LocateButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar", "esri/SnappingManager", "esri/dijit/Measurement",
         "dojox/grid/DataGrid", "dijit/TitlePane", "dijit/form/Button", "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dijit/layout/AccordionContainer", "dojo/domReady!"],
-    function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer,FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
+    function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
               PictureMarkerSymbol, SimpleRenderer, SimpleLineSymbol, SimpleFillSymbol, Color, Editor, Print, AttributeInspector, QueryTask, QueryT, query, array, ItemFileReadStore,
               Polygon, Point, CheckBox, keys, ToolbarSeparator, HomeButton, LocateButton, OverviewMap, Scalebar, SnappingManager, Measurement) {
         parser.parse();
@@ -10,9 +10,10 @@
         var map = new Map("map", {
             //center: [-117.535, 34.28],
             //extent:extent,
+            autoResize: true,
             zoom: 3,
             maxZoom: 10, //最大缩放层级
-            minZoom: 2,//最小缩放层级
+            // minZoom: 2,//最小缩放层级
             logo: false
         });
 
@@ -51,7 +52,10 @@
 
         var agoServiceURL = "http://60.29.110.104:6080/arcgis/rest/services/一张网/一张网底图/MapServer";
         //var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4, 5, 6, 7] });
-        var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL);
+        var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, {
+            id: "baseMap",
+            displayLevels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+        });
         map.addLayer(agoLayer);
 
         //添加详细地块及项目名称图层 --动态图层
@@ -61,26 +65,23 @@
             opacity: 0.95,
             visible: true
         });
-        baseDyn.setVisibleLayers([0,1]);
+        baseDyn.setVisibleLayers([0, 1]);
         map.addLayer(baseDyn);
 
-
-        // var baseUrl = "http://60.29.110.104:6080/arcgis/rest/services/FeatureMap20151208/FeatureServer/"; //此图层只有层  ?
-        var baseUrl = "http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计/FeatureServer/"; //此图层只有层  ?
+        var baseUrl = "http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计/FeatureServer/";
         var pointsOfInterest = new FeatureLayer(baseUrl + "0", {
             mode: FeatureLayer.MODE_ONDEMAND,
             outFields: ['*']
         });
-        // var WildfireLine = new FeatureLayer(baseUrl + "1", {
-        //     mode: FeatureLayer.MODE_ONDEMAND,
-        //     outFields: ['*']
-        // });
-        // var evacuationPerimeter = new FeatureLayer(baseUrl + "2", {
-        //     mode: FeatureLayer.MODE_ONDEMAND,
-        //     outFields: ['*']
-        // });
-
-        //map.addLayers([pointsOfInterest, WildfireLine, evacuationPerimeter]);
+        /*        var WildfireLine = new FeatureLayer(baseUrl + "1", {
+         mode: FeatureLayer.MODE_ONDEMAND,
+         outFields: ['*']
+         });
+         var evacuationPerimeter = new FeatureLayer(baseUrl + "2", {
+         mode: FeatureLayer.MODE_ONDEMAND,
+         outFields: ['*']
+         });
+         map.addLayers([pointsOfInterest, WildfireLine, evacuationPerimeter]);*/
         map.addLayers([pointsOfInterest]);
         var sfs = new SimpleFillSymbol(
             "solid",
@@ -88,18 +89,8 @@
             null
         );
 
-        //MeasureWidget
-        //esriConfig.defaults.io.proxyUrl = "proxy.ashx";
-        //esriConfig.defaults.io.alwaysUseProxy = false;
-        //esriConfig.defaults.geometryService = new GeometryService("http://60.29.110.104:6080/arcgis/rest/services/Utilities/Geometry/GeometryServer");
-        var parcelsLayer = new FeatureLayer("http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计/FeatureServer/0", {
-            mode: FeatureLayer.MODE_ONDEMAND,
-            outFields: ["*"]
-        });  //空港点数据
-        parcelsLayer.setRenderer(new SimpleRenderer(sfs));
-        map.addLayers([parcelsLayer]);
         //创建图层,用于显示查询出来的点
-        var SearchLayer=new GraphicsLayer();
+        var SearchLayer = new GraphicsLayer();
         map.addLayer(SearchLayer);
         //创建临时图形图层,为Table点击生成临时高亮点，容易清理
         var TempLayer = new GraphicsLayer();
@@ -110,10 +101,10 @@
             snapKey: has("mac") ? keys.META : keys.CTRL
         });
         var layerInfos = [{
-            layer: parcelsLayer
+            // layer: parcelsLayer
+            layer: pointsOfInterest
         }];
         snapManager.setLayerInfos(layerInfos);
-
 
 
         var measurement = new Measurement({
@@ -136,15 +127,7 @@
          distanceToggled = false;
          }
          };*/
-        //MeasureWidget End
-        // close the info window when esc is pressed
-        map.on("key-down", function (e) {
-            if (e.keyCode === 27) {
-                //measurement.clearResult();
-                //measurement.destroy();
-                //measurement.startup();
-            }
-        });
+
         //on(dom.byId("execute"), "click", execute);  //执行示例
         function initEditor(evt) {
             //build the layer and field information for the layer, display the description field
@@ -207,26 +190,26 @@
             });
 
 
-            //add the snapping checkbox to the editor's toolbar
-            // var myToolbarElement = query(".esriDrawingToolbar", editorWidget.domNode)[0];
-            // var myToolbar = registry.byId(myToolbarElement.id);
-            //
-            // myToolbar.addChild(new ToolbarSeparator());
-            // myToolbar.addChild(checkBox);
+            // add the snapping checkbox to the editor's toolbar
+            var myToolbarElement = query(".esriDrawingToolbar", editorWidget.domNode)[0];
+            var myToolbar = registry.byId(myToolbarElement.id);
+
+            myToolbar.addChild(new ToolbarSeparator());
+            myToolbar.addChild(checkBox);
 
             editorWidget.startup();
 
             //listen for the template pickers onSelectionChange and disable
             //the snapping checkbox when a template is selected
-            // var templatePickerElement = query(".esriTemplatePicker", editorWidget.domNode)[0];
-            // var templatePicker = registry.byId(templatePickerElement.id);
-            // templatePicker.on("selection-change", function () {
-            //     if (templatePicker.getSelected()) {
-            //         registry.byId('chkSnapping').set("disabled", true);
-            //     } else {
-            //         registry.byId('chkSnapping').set("disabled", false);
-            //     }
-            // });
+            var templatePickerElement = query(".esriTemplatePicker", editorWidget.domNode)[0];
+            var templatePicker = registry.byId(templatePickerElement.id);
+            templatePicker.on("selection-change", function () {
+                if (templatePicker.getSelected()) {
+                    registry.byId('chkSnapping').set("disabled", true);
+                } else {
+                    registry.byId('chkSnapping').set("disabled", false);
+                }
+            });
             map.infoWindow.resize(325, 200);
         }
 
@@ -248,14 +231,16 @@
         //显示地图坐标
         function showCoordinates(evt) {
             var mp = evt.mapPoint;
-            dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x + " , " + mp.y;  //toFiex(2) 限制小数点后显示的位数 //TODO:toFiex(2)为什么报错了
+            dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x.toFixed(2) + " , " + mp.y.toFixed(2);
         }
 
         map.on("key-down", function (e) {
             if (e.keyCode == 27) {
                 remove();
             } else if (e.keyCode == 83) {
-                on(dom.byId("btnTS"), "click-down", activateTool);
+                console.log("keycode:83 s S");
+            }else{
+                console.log(e.keyCode);
             }
         });
         //Listen for row clicks in the dojo table
@@ -272,9 +257,9 @@
         var FeatureServerUrl = "http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计/FeatureServer/";
         // queryTask.on("complete", showResult);
         var queryTask;
-        var query = new QueryT(); //todo:解决冲突
-        query.returnGeometry = true;
-        query.outFields = ["OBJECTID", "Num","Type", "CRDate", "Material", "ROAD_LANE"];
+        var queryT = new QueryT();
+        queryT.returnGeometry = true;
+        queryT.outFields = ["OBJECTID", "Num", "Type", "CRDate", "Material", "ROAD_LANE"];
 
         function activateTool() {
             var tool = null;
@@ -329,7 +314,7 @@
 
         //Draw a dojox table using an array as input
         function drawTable(features) {
-            console.log(features);
+            // console.log(features);
             var items = []; //all items to be stored in data store
             //items = dojo.map(features, function(feature) {return feature.attributes});
             items = array.map(features, "return item.attributes");
@@ -413,8 +398,8 @@
             });
             var handgraphic = new Graphic(polygon, symbol);
             //map.graphics.add(handgraphic);//不显示画出来的线
-            query.geometry = handgraphic.geometry;
-            queryTask.execute(query);
+            queryT.geometry = handgraphic.geometry;
+            queryTask.execute(queryT);
         }
 
         //海港范围
@@ -436,8 +421,8 @@
             });
             var handgraphic = new Graphic(polygon, symbol);
             //map.graphics.add(handgraphic);//不显示画出来的线
-            query.geometry = handgraphic.geometry;
-            queryTask.execute(query);
+            queryT.geometry = handgraphic.geometry;
+            queryTask.execute(queryT);
         }
 
         //物流范围
@@ -459,8 +444,8 @@
             });
             var handgraphic = new Graphic(polygon, symbol);
             //map.graphics.add(handgraphic);//不显示画出来的线
-            query.geometry = handgraphic.geometry;
-            queryTask.execute(query);
+            queryT.geometry = handgraphic.geometry;
+            queryTask.execute(queryT);
         }
 
         //Set drawing properties and add polygon to map
@@ -472,8 +457,8 @@
             //map.infoWindow.resize(325, 200);
 
             // 将用户绘制的几何对象传入查询参数
-            query.geometry = handgraphic.geometry;
-            queryTask.execute(query);
+            queryT.geometry = handgraphic.geometry;
+            queryTask.execute(queryT);
         }
 
         var evtResult;  //用于临时保存空间查询出来的数据，以便后续二次操作
@@ -481,20 +466,20 @@
         function showResult(evt) {
             var resultFeatures = evt.featureSet.features;
             evtResult = resultFeatures;
-            var resultFeaturesFilter=[];
-            console.log(resultFeatures);
-            var searchYear=document.getElementById('searchYear').value;
+            var resultFeaturesFilter = [];
+            // console.log(resultFeatures);
+            var searchYear = document.getElementById('searchYear').value;
 
             for (var i = 0, il = resultFeatures.length; i < il; i++) {
-                var time=new Date(resultFeatures[i].attributes['CRDate']);
-                if(time.getFullYear()==searchYear){
+                var time = new Date(resultFeatures[i].attributes['CRDate']);
+                if (time.getFullYear() == searchYear) {
                     var graphic = resultFeatures[i];
                     //Assign a symbol sized based on populuation
                     setTheSymbol(graphic);
                     // map.graphics.add(graphic);
                     SearchLayer.add(graphic);
                     resultFeaturesFilter.push(graphic);
-                }else if(searchYear==""){
+                } else if (searchYear == "") {
                     var graphic = resultFeatures[i];
                     //Assign a symbol sized based on populuation
                     setTheSymbol(graphic);
@@ -503,11 +488,11 @@
                     resultFeaturesFilter.push(graphic);
                 }
             }
-            evtFileters=resultFeaturesFilter;
+            evtFileters = resultFeaturesFilter;
             drawTable(resultFeaturesFilter);
-            console.log(resultFeaturesFilter);
+            // console.log(resultFeaturesFilter);
             var total = sumPopulation(evt.featureSet);
-            showResultMon(resultFeaturesFilter,-1);
+            showResultMon(resultFeaturesFilter, -1);
             var r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12;
             var s = total.split(',');
             r1 = s[0];
@@ -599,16 +584,16 @@
                 if (time.getMonth() == MonNum) {
                     resultFeaturesMon[j++] = evtResult[i];
                     switchResult(evtResult[i].attributes['Type'][0]);
-                    console.log(time.getMonth());
-                    console.log(evtResult[i].attributes['Type'][0]);
-                    console.log(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13);
-                }else if(MonNum==-1){
+                    // console.log(time.getMonth());
+                    // console.log(evtResult[i].attributes['Type'][0]);
+                    // console.log(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13);
+                } else if (MonNum == -1) {
                     resultFeaturesMon[j++] = evtResult[i];
                     switchResult(evtResult[i].attributes['Type'][0]);
-                    console.log(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13);
+                    // console.log(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13);
                 }
             }
-            function switchResult(att){
+            function switchResult(att) {
                 switch (att) {
                     case "垃圾箱":
                         t1 += 1;
@@ -638,34 +623,74 @@
                         t9 += 1;
                         break;
                     case "河道警示牌":
-                        t10 +=1;
+                        t10 += 1;
                         break;
                     case "西湖牌匾":
-                        t11+=1;
+                        t11 += 1;
                         break;
                     case "钓鱼牌":
-                        t12+=1;
+                        t12 += 1;
                         break;
                     case "水域护栏":
-                        t13+=1;
+                        t13 += 1;
                         break;
                     default :
                         break;
                 }
             }
-            if(t1==0){}else{document.getElementById('type1').innerHTML = "   " + t1 + "个";}
-            if(t2==0){}else{document.getElementById('type2').innerHTML = "   " + t2 + "个";}
-            if(t3==0){}else{document.getElementById('type3').innerHTML = "   " + t3 + "个";}
-            if(t4==0){}else{document.getElementById('type4').innerHTML = "   " + t4 + "个";}
-            if(t5==0){}else{document.getElementById('type5').innerHTML = "   " + t5 + "个";}
-            if(t6==0){}else{document.getElementById('type6').innerHTML = "   " + t6 + "个";}
-            if(t7==0){}else{document.getElementById('type7').innerHTML = "   " + t7 + "个";}
-            if(t8==0){}else{document.getElementById('type8').innerHTML = "   " + t8 + "个";}
-            if(t9==0){}else{document.getElementById('type9').innerHTML = "   " + t9 + "个";}
-            if(t10==0){}else{document.getElementById('type10').innerHTML = "   " + t10 + "个";}
-            if(t11==0){}else{document.getElementById('type11').innerHTML = "   " + t11 + "个";}
-            if(t12==0){}else{document.getElementById('type12').innerHTML = "   " + t12 + "个";}
-            if(t13==0){}else{document.getElementById('type13').innerHTML = "   " + t13 + "个";}
+
+            if (t1 == 0) {
+            } else {
+                document.getElementById('type1').innerHTML = "   " + t1 + "个";
+            }
+            if (t2 == 0) {
+            } else {
+                document.getElementById('type2').innerHTML = "   " + t2 + "个";
+            }
+            if (t3 == 0) {
+            } else {
+                document.getElementById('type3').innerHTML = "   " + t3 + "个";
+            }
+            if (t4 == 0) {
+            } else {
+                document.getElementById('type4').innerHTML = "   " + t4 + "个";
+            }
+            if (t5 == 0) {
+            } else {
+                document.getElementById('type5').innerHTML = "   " + t5 + "个";
+            }
+            if (t6 == 0) {
+            } else {
+                document.getElementById('type6').innerHTML = "   " + t6 + "个";
+            }
+            if (t7 == 0) {
+            } else {
+                document.getElementById('type7').innerHTML = "   " + t7 + "个";
+            }
+            if (t8 == 0) {
+            } else {
+                document.getElementById('type8').innerHTML = "   " + t8 + "个";
+            }
+            if (t9 == 0) {
+            } else {
+                document.getElementById('type9').innerHTML = "   " + t9 + "个";
+            }
+            if (t10 == 0) {
+            } else {
+                document.getElementById('type10').innerHTML = "   " + t10 + "个";
+            }
+            if (t11 == 0) {
+            } else {
+                document.getElementById('type11').innerHTML = "   " + t11 + "个";
+            }
+            if (t12 == 0) {
+            } else {
+                document.getElementById('type12').innerHTML = "   " + t12 + "个";
+            }
+            if (t13 == 0) {
+            } else {
+                document.getElementById('type13').innerHTML = "   " + t13 + "个";
+            }
             drawTable(resultFeaturesMon);
         }
 
@@ -688,7 +713,7 @@
             var Month1 = 0, Month2 = 0, Month3 = 0, Month4 = 0, Month5 = 0, Month6 = 0, Month7 = 0, Month8 = 0, Month9 = 0, Month10 = 0, Month11 = 0, Month12 = 0, Other = 0;
             for (var x = 0; x < features.length; x++) {
                 var time = new Date(features[x].attributes['CRDate']);
-                if(time.getFullYear()==document.getElementById("searchYear").value){
+                if (time.getFullYear() == document.getElementById("searchYear").value) {
                     switch (Number(time.getMonth() + 1)) {
                         case 1:
                             Month1 += 1;
@@ -729,7 +754,7 @@
                         default:
                             Other += 1;
                     }
-                }else if(document.getElementById("searchYear").value==""){
+                } else if (document.getElementById("searchYear").value == "") {
                     switch (Number(time.getMonth() + 1)) {
                         case 1:
                             Month1 += 1;
@@ -776,15 +801,14 @@
         }
 
 
-
         //On row click
         function onTableRowClick(evt) {
             var clickedId = gridWidget.getItem(evt.rowIndex).OBJECTID;
-            console.log(clickedId);
+            // console.log(clickedId);
             var graphic;
             for (var i = 0, il = SearchLayer.graphics.length; i < il; i++) {
                 var currentGraphic = SearchLayer.graphics[i];
-                console.log(currentGraphic);
+                // console.log(currentGraphic);
                 if ((currentGraphic.attributes) && currentGraphic.attributes.OBJECTID == clickedId) {
                     graphic = currentGraphic;
                     break;
@@ -856,7 +880,8 @@
             SearchLayer.clear();
             drawTable();
         }
-        function removeSum(){
+
+        function removeSum() {
             // dojo.byId('totalPopulation').innerHTML = "";
             document.getElementById('type1').innerHTML = "";
             document.getElementById('type2').innerHTML = "";
@@ -872,7 +897,6 @@
             document.getElementById('type12').innerHTML = "";
             document.getElementById('type13').innerHTML = "";
         }
-
 
 
         // var vueMain = new Vue({
