@@ -16,17 +16,30 @@
             // minZoom: 2,//最小缩放层级
             logo: false
         });
+        if (map.loaded) {
+            var home = new HomeButton({
+                map: map
+            }, "HomeButton");
+            home.startup();
+            //定位
+            geoLocate = new LocateButton({
+                map: map
+            }, "LocateButton");
+            geoLocate.startup();
+        } else {
+            map.on("load", function () {
+                var home = new HomeButton({
+                    map: map
+                }, "HomeButton");
+                home.startup();
+                //定位
+                geoLocate = new LocateButton({
+                    map: map
+                }, "LocateButton");
+                geoLocate.startup();
+            });
+        }
 
-        var home = new HomeButton({
-            map: map
-        }, "HomeButton");
-        home.startup();
-
-        //定位
-        geoLocate = new LocateButton({
-            map: map
-        }, "LocateButton");
-        geoLocate.startup();
 
         var overviewMapDijit = new OverviewMap({
             map: map,  //必要的
@@ -51,7 +64,6 @@
         });
 
         var agoServiceURL = "http://60.29.110.104:6080/arcgis/rest/services/一张网/一张网底图/MapServer";
-        //var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, { displayLevels: [0, 1, 2, 3, 4, 5, 6, 7] });
         var agoLayer = new ArcGISTiledMapServiceLayer(agoServiceURL, {
             id: "baseMap",
             displayLevels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
@@ -63,15 +75,17 @@
         var baseDyn = new ArcGISDynamicMapServiceLayer(urlDyn, {
             id: "base_road_name",
             opacity: 0.95,
-            visible: true
+            visible: true,
         });
-        baseDyn.setVisibleLayers([0, 1]);
+        baseDyn.setVisibleLayers([0, 1, 2]);
         map.addLayer(baseDyn);
 
         var baseUrl = "http://60.29.110.104:6080/arcgis/rest/services/在线编辑/部件统计/FeatureServer/";
         var pointsOfInterest = new FeatureLayer(baseUrl + "0", {
-            mode: FeatureLayer.MODE_ONDEMAND,
-            outFields: ['*']
+            // mode: FeatureLayer.MODE_ONDEMAND,
+            mode: FeatureLayer.MODE_AUTO,
+            outFields: ['*'],
+            maxRecordCount: 200
         });
         /*        var WildfireLine = new FeatureLayer(baseUrl + "1", {
          mode: FeatureLayer.MODE_ONDEMAND,
@@ -101,7 +115,6 @@
             snapKey: has("mac") ? keys.META : keys.CTRL
         });
         var layerInfos = [{
-            // layer: parcelsLayer
             layer: pointsOfInterest
         }];
         snapManager.setLayerInfos(layerInfos);
@@ -115,20 +128,6 @@
         }, dom.byId("measurementDiv"));
         measurement.startup();
 
-        /*          measurement.areaToggleButton = function () {
-         //this.clearResult();
-         this.setTool("area");
-         if ( areaToggled ){
-         clickHandler = dojo.connect(map, "onClick", executeIdentifyTask);
-         areaToggled = false;
-         }else{
-         dojo.disconnect(clickHandler);
-         areaToggled = true;
-         distanceToggled = false;
-         }
-         };*/
-
-        //on(dom.byId("execute"), "click", execute);  //执行示例
         function initEditor(evt) {
             //build the layer and field information for the layer, display the description field
             //using a text area.
@@ -234,15 +233,15 @@
             dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x.toFixed(2) + " , " + mp.y.toFixed(2);
         }
 
-        map.on("key-down", function (e) {
-            if (e.keyCode == 27) {
-                remove();
-            } else if (e.keyCode == 83) {
-                console.log("keycode:83 s S");
-            }else{
-                console.log(e.keyCode);
-            }
-        });
+        /*map.on("key-down", function (e) {
+         if (e.keyCode == 27) {
+         remove();
+         } else if (e.keyCode == 83) {
+         console.log("keycode:83 s S");
+         } else {
+         // console.log(e.keyCode);
+         }
+         });*/
         //Listen for row clicks in the dojo table
         gridWidget.on("RowClick", onTableRowClick);
         //Populate table with headers
@@ -259,44 +258,44 @@
         var queryTask;
         var queryT = new QueryT();
         queryT.returnGeometry = true;
+
         queryT.outFields = ["OBJECTID", "Num", "Type", "CRDate", "Material", "ROAD_LANE"];
 
         function activateTool() {
             var tool = null;
-            if (this.label == "清空") {
-                remove();
-            } else {
-                switch (this.label) {
-                    case "空港范围":
-                        remove();
-                        //tool = "POLYGON";
-                        queryTask = new QueryTask(FeatureServerUrl + "0");
-                        queryTask.on("complete", showResult);
-                        addGraphicALL();
-                        break;
-                    case "徒手":
-                        remove();
-                        tool = "FREEHAND_POLYGON";
-                        tb.activate(Draw[tool]);
-                        break;
-                    case "物流范围":
-                        remove();
-                        queryTask = new QueryTask(FeatureServerUrl + "0");
-                        queryTask.on("complete", showResult);
-                        addGraphicALLWuLiu();
-                        break;
-                    case "海港范围":
-                        remove();
-                        queryTask = new QueryTask(FeatureServerUrl + "0");
-                        queryTask.on("complete", showResult);
-                        addGraphicALLHaiGang();
-                        break;
-                    default:
-                        break;
-                }
-                // tb.activate(Draw[tool]);
-                //map.hideZoomSlider();
+            switch (this.label) {
+                case "清空":
+                    remove();
+                    break;
+                case "空港范围":
+                    remove();
+                    //tool = "POLYGON";
+                    queryTask = new QueryTask(FeatureServerUrl + "0");
+                    queryTask.on("complete", showResult);
+                    addGraphicALL();
+                    break;
+                case "徒手":
+                    remove();
+                    tool = "FREEHAND_POLYGON";
+                    tb.activate(Draw[tool]);
+                    break;
+                case "物流范围":
+                    remove();
+                    queryTask = new QueryTask(FeatureServerUrl + "0");
+                    queryTask.on("complete", showResult);
+                    addGraphicALLWuLiu();
+                    break;
+                case "海港范围":
+                    remove();
+                    queryTask = new QueryTask(FeatureServerUrl + "0");
+                    queryTask.on("complete", showResult);
+                    addGraphicALLHaiGang();
+                    break;
+                default:
+                    break;
             }
+            // tb.activate(Draw[tool]);
+            //map.hideZoomSlider();
         }
 
         function setGridHeader() {
@@ -397,8 +396,9 @@
                 }
             });
             var handgraphic = new Graphic(polygon, symbol);
-            //map.graphics.add(handgraphic);//不显示画出来的线
+            // map.graphics.add(handgraphic);//不显示画出来的线
             queryT.geometry = handgraphic.geometry;
+            queryT.where = "1 = 1 ";
             queryTask.execute(queryT);
         }
 
@@ -464,6 +464,7 @@
         var evtResult;  //用于临时保存空间查询出来的数据，以便后续二次操作
         var evtFileters;//过滤后的空间数据
         function showResult(evt) {
+            // evt.featureSet.exceededTransferLimit = false;
             var resultFeatures = evt.featureSet.features;
             evtResult = resultFeatures;
             var resultFeaturesFilter = [];
@@ -473,19 +474,19 @@
             for (var i = 0, il = resultFeatures.length; i < il; i++) {
                 var time = new Date(resultFeatures[i].attributes['CRDate']);
                 if (time.getFullYear() == searchYear) {
-                    var graphic = resultFeatures[i];
+                    var graphic1 = resultFeatures[i];
                     //Assign a symbol sized based on populuation
-                    setTheSymbol(graphic);
+                    setTheSymbol(graphic1);
                     // map.graphics.add(graphic);
-                    SearchLayer.add(graphic);
-                    resultFeaturesFilter.push(graphic);
+                    SearchLayer.add(graphic1);
+                    resultFeaturesFilter.push(graphic1);
                 } else if (searchYear == "") {
-                    var graphic = resultFeatures[i];
+                    var graphic2 = resultFeatures[i];
                     //Assign a symbol sized based on populuation
-                    setTheSymbol(graphic);
+                    setTheSymbol(graphic2);
                     // map.graphics.add(graphic);
-                    SearchLayer.add(graphic);
-                    resultFeaturesFilter.push(graphic);
+                    SearchLayer.add(graphic2);
+                    resultFeaturesFilter.push(graphic2);
                 }
             }
             evtFileters = resultFeaturesFilter;
@@ -897,21 +898,4 @@
             document.getElementById('type12').innerHTML = "";
             document.getElementById('type13').innerHTML = "";
         }
-
-
-        // var vueMain = new Vue({
-        //     el: "#SearchMap",
-        //     data: {
-        //         searchByYear: ""
-        //     },
-        //     ready: function () {
-        //         var t = new Date();
-        //         this.searchByYear = t.getFullYear();
-        //     },
-        //     methods: {
-        //         btnSearch: function () {
-        //             console.log("vue成功了");
-        //         }
-        //     }
-        // })
     });
