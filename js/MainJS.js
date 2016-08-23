@@ -464,7 +464,13 @@
         var evtResult;  //用于临时保存空间查询出来的数据，以便后续二次操作
         var evtFileters;//过滤后的空间数据
         function showResult(evt) {
-            // evt.featureSet.exceededTransferLimit = false;
+            var isLimit = evt.featureSet.exceededTransferLimit;
+            if (undefined != isLimit && isLimit == true) {
+                alert("\r查询出现错误,请联系管理员.\n" +
+                    "Eamil:wwei.min@163.com\n\r" +
+                    "[注:查询结果大于发布时设置的最大返回记录数] \n"
+                )
+            }
             var resultFeatures = evt.featureSet.features;
             evtResult = resultFeatures;
             var resultFeaturesFilter = [];
