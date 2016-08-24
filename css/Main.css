@@ -179,3 +179,16 @@ html, body, #mainWindow
     font:bold 14px arial verdana;
     color:#5400fb;
 }
+.toggle ul {
+    list-style: none;
+    margin:0;
+}
+.toggle ul li{
+    /*float: left;*/
+}
+.toggle ul li:hover{
+    background-color: #cfe5fa;
+}
+.dtoggle ul li label{
+    cursor: pointer;
+}

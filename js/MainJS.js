@@ -1,10 +1,21 @@
-﻿require(["dojo/dom", "dojo/parser", "dijit/registry", "esri/config", "esri/sniff", 'dojo/on', "esri/map", "esri/layers/ArcGISTiledMapServiceLayer", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/FeatureLayer", "esri/tasks/GeometryService", "esri/units", "esri/geometry/Extent", "esri/SpatialReference", "esri/InfoTemplate", "esri/graphic", "esri/layers/GraphicsLayer", "esri/toolbars/draw",
-        "esri/symbols/PictureMarkerSymbol", "esri/renderers/SimpleRenderer", "esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol", "esri/Color", "esri/dijit/editing/Editor", "esri/dijit/Print", "esri/dijit/AttributeInspector", "esri/tasks/QueryTask", "esri/tasks/query", "dojo/query", "dojo/_base/array", "dojo/data/ItemFileReadStore",
-        "esri/geometry/Polygon", "esri/geometry/Point", "dijit/form/CheckBox", "dojo/keys", "dijit/ToolbarSeparator", "esri/dijit/HomeButton", "esri/dijit/LocateButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar", "esri/SnappingManager", "esri/dijit/Measurement",
-        "dojox/grid/DataGrid", "dijit/TitlePane", "dijit/form/Button", "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dijit/layout/AccordionContainer", "dojo/domReady!"],
-    function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
-              PictureMarkerSymbol, SimpleRenderer, SimpleLineSymbol, SimpleFillSymbol, Color, Editor, Print, AttributeInspector, QueryTask, QueryT, query, array, ItemFileReadStore,
-              Polygon, Point, CheckBox, keys, ToolbarSeparator, HomeButton, LocateButton, OverviewMap, Scalebar, SnappingManager, Measurement) {
+﻿require(["dojo/dom", "dojo/parser", "dijit/registry", "esri/config", "esri/sniff", 'dojo/on', "esri/map",
+        "esri/layers/ArcGISTiledMapServiceLayer", "esri/layers/ArcGISDynamicMapServiceLayer",
+        "esri/layers/FeatureLayer", "esri/tasks/GeometryService", "esri/units", "esri/geometry/Extent",
+        "esri/SpatialReference", "esri/InfoTemplate", "esri/graphic", "esri/layers/GraphicsLayer", "esri/toolbars/draw",
+        "esri/symbols/PictureMarkerSymbol", "esri/renderers/SimpleRenderer", "esri/symbols/SimpleLineSymbol",
+        "esri/symbols/SimpleFillSymbol", "esri/Color", "esri/dijit/editing/Editor", "esri/dijit/Print",
+        "esri/dijit/AttributeInspector", "esri/tasks/QueryTask", "esri/tasks/query", "dojo/query",
+        "dojo/_base/array", "dojo/data/ItemFileReadStore",
+        "esri/geometry/Polygon", "esri/geometry/Point", "dijit/form/CheckBox", "dojo/keys",
+        "dijit/ToolbarSeparator", "esri/dijit/HomeButton", "esri/dijit/LocateButton", "esri/dijit/OverviewMap",
+        "esri/dijit/Scalebar", "esri/SnappingManager", "esri/dijit/Measurement",
+        "dojox/grid/DataGrid", "dijit/TitlePane", "dijit/form/Button", "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane", "dijit/layout/AccordionContainer", "dojo/domReady!"],
+    function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer,
+              FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
+              PictureMarkerSymbol, SimpleRenderer, SimpleLineSymbol, SimpleFillSymbol, Color, Editor, Print, AttributeInspector,
+              QueryTask, QueryT, query, array, ItemFileReadStore, Polygon, Point, CheckBox, keys, ToolbarSeparator,
+              HomeButton, LocateButton, OverviewMap, Scalebar, SnappingManager, Measurement) {
         parser.parse();
         //var extent = new Extent(-95.271, 38.933, -95.228, 38.976, new SpatialReference({ wkid: 4326 }));
         var map = new Map("map", {
@@ -212,7 +223,7 @@
             map.infoWindow.resize(325, 200);
         }
 
-        ////////////////////////////////////////////////////////--------右侧功能区---------///////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////--------右侧功能区---------//////////////////////////////
 
 
         var tb = new Draw(map);
@@ -247,7 +258,9 @@
         //Populate table with headers
         setGridHeader();
 
-        var symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT, new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
+        var symbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+            new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT,
+                new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.5]));
         var pntSym1 = new PictureMarkerSymbol("images/CircleBlue16.png", 16, 16);
         var pntSym2 = new PictureMarkerSymbol("images/CircleBlue24.png", 18, 18);
         var pntSym3 = new PictureMarkerSymbol("images/CircleRed32.png", 25, 25);
@@ -496,6 +509,7 @@
                 }
             }
             evtFileters = resultFeaturesFilter;
+            vue.tableResultFeatures=evtFileters;
             drawTable(resultFeaturesFilter);
             // console.log(resultFeaturesFilter);
             var total = sumPopulation(evt.featureSet);
@@ -904,4 +918,56 @@
             document.getElementById('type12').innerHTML = "";
             document.getElementById('type13').innerHTML = "";
         }
+
+        var _listType = [{id: "1", name: "垃圾箱"}, {id: "2", name: "路名牌"}, {id: "3", name: "挡车桩"},
+            {id: "4", name: "公交站亭"}, {id: "5", name: "公交站牌"}, {id: "6", name: "不锈钢垃圾箱"},
+            {id: "7", name: "企业指示牌"}, {id: "8", name: "路边座椅"},
+            {id: "9", name: "湖区座椅"}, {id: "10", name: "河道警示牌"}, {id: "11", name: "西湖牌匾"},
+            {id: "12", name: "钓鱼牌"}, {id: "13", name: "水域护栏"}];
+        var vue = new Vue({
+            el: "body",
+            data: {
+                checked: [],
+                showList: false,
+                list: _listType,
+                tableResultFeatures:[]
+            },
+            computed: {
+                allChecked: {
+                    get: function () {
+                        return this.checkedCount == this.list.length;
+                    },
+                    set: function (value) {
+                        if (value) {
+                            this.checked = this.list.map(function (item) {
+                                return item.name
+                            })
+                        } else {
+                            this.checked = []
+                        }
+                    }
+                },
+                checkedCount: {
+                    get: function () {
+                        return this.checked.length;
+                    }
+                }
+            },
+            watch:{
+                checked:function(value,oldValue){
+                    console.log(value);
+                    console.log(this.tableResultFeatures);
+                    var filterResult;
+                    forEach(this.tableResultFeatures,function(item){
+
+                    });
+                    drawTable(filterResult);
+                }
+            },
+            methods: {
+                showListType: function () {
+                    this.showList = !this.showList;
+                }
+            }
+        });
     });

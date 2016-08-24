@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
     <title>空港部件调查</title>
     <link rel="shortcut icon" href="images/logo.ico"/>
@@ -13,16 +14,6 @@
           href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/dojo/dojox/grid/resources/Grid.css">
     <link rel="stylesheet" href="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/js/esri/css/esri.css"/>
     <link rel="stylesheet" href="css/Main.css"/>
-    <script type="text/javascript" src="js/vue.js"></script>
-    <script src="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/init.js"></script>
-
-
-    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
-    <script type="text/javascript" src="js/MainJS.js"></script>
 
     <!--    <script type="text/javascript">
             dojoConfig = {
@@ -45,7 +36,7 @@
         <!--<div id="printButton"></div>-->
     </div>
     <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"
-         style="background-color: #FFFFFF; padding: 5px;">
+         style="background-color: #FFFFFF; padding: 4px;">
         <div style="position: absolute; right: 0; top: 0; z-Index: 99;">
             <div id="titlePane" data-dojo-type="dijit/TitlePane"
                  data-dojo-props="title:'测量', closable:'false', open:'true'">
@@ -70,7 +61,8 @@
                     </div>
 
                     <div style="padding: 8px 2px 10px 2px;">
-                        <span>查询日期:</span><input type="text" placeholder="按年份查询,为空时查询所有数据"  id="searchYear" style="width: auto;"><span>年</span>
+                        <span>查询日期:</span><input type="text" placeholder="按年份查询,为空时查询所有数据" id="searchYear"
+                                                 style="width: auto;"><span>年</span>
                         <!--<button type="button" @click="btnSearch">查询</button>-->
                     </div>
                     <table class="tblist">
@@ -132,6 +124,27 @@
                         </tr>
                     </table>
                 </div>
+                <hr>
+                <div class="pull-right search">
+                    <input class="form-control input-outline" type="text" placeholder="搜索">
+                    <button type="button" class="btn btn-default">搜索</button>
+                    <button type="button" @click="showListType">
+                        下拉选择
+                    </button>
+                </div>
+                <div class="toggle" title="">
+                    <ul class="dropdown-menu" role="menu" v-show="showList">
+                        <li><label><input type="checkbox" v-model="allChecked" title="全选"> 全选({{checkedCount}})</label>
+                        </li>
+                        <li v-for="item in list">
+                            <label title="{{item.name}}">
+                                <input type="checkbox" class='input-checkbox'
+                                       :value="item.name" v-model="checked" checked="checked"> {{item.name}}</label>
+                        </li>
+                    </ul>
+                </div>
+                <hr>
+
                 <div id="grid" data-dojo-type="dojox/grid/DataGrid" data-dojo-id="gridWidget"></div>
                 <div class="Dislist">
                     <span>类型列表</span>
@@ -168,6 +181,13 @@
     <span id="XYinfo"
           style="background-color:transparent; font-weight: normal; font-size: smaller;color:#FFFFFF; position: absolute; padding: 2px; left: 240px; bottom: 2px; z-index: 99;"></span>
 </div>
-
+<script type="text/javascript" src="js/vue.js"></script>
+<script src="http://60.29.110.104/arcgis_js_api/library/3.9/3.9/init.js"></script>
+<!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+<![endif]-->
+<script type="text/javascript" src="js/MainJS.js"></script>
 </body>
 </html>
