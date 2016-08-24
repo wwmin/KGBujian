@@ -8,14 +8,14 @@
         "dojo/_base/array", "dojo/data/ItemFileReadStore",
         "esri/geometry/Polygon", "esri/geometry/Point", "dijit/form/CheckBox", "dojo/keys",
         "dijit/ToolbarSeparator", "esri/dijit/HomeButton", "esri/dijit/LocateButton", "esri/dijit/OverviewMap",
-        "esri/dijit/Scalebar", "esri/SnappingManager", "esri/dijit/Measurement",
+        "esri/dijit/Scalebar", "esri/SnappingManager", "esri/dijit/BasemapToggle", "esri/dijit/Measurement",
         "dojox/grid/DataGrid", "dijit/TitlePane", "dijit/form/Button", "dijit/layout/BorderContainer",
         "dijit/layout/ContentPane", "dijit/layout/AccordionContainer", "dojo/domReady!"],
     function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer,
               FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
               PictureMarkerSymbol, SimpleRenderer, SimpleLineSymbol, SimpleFillSymbol, Color, Editor, Print, AttributeInspector,
               QueryTask, QueryT, query, array, ItemFileReadStore, Polygon, Point, CheckBox, keys, ToolbarSeparator,
-              HomeButton, LocateButton, OverviewMap, Scalebar, SnappingManager, Measurement) {
+              HomeButton, LocateButton, OverviewMap, Scalebar, SnappingManager, BasemapToggle, Measurement) {
         parser.parse();
         //var extent = new Extent(-95.271, 38.933, -95.228, 38.976, new SpatialReference({ wkid: 4326 }));
         var map = new Map("map", {
@@ -51,6 +51,12 @@
             });
         }
 
+        //卫星底图
+        var toggle = new BasemapToggle({
+            map: map,
+            basemap: "satellite"
+        }, "BasemapToggle");
+        toggle.startup();
 
         var overviewMapDijit = new OverviewMap({
             map: map,  //必要的
@@ -241,10 +247,10 @@
         //显示地图坐标
         function showCoordinates(evt) {
             var mp = evt.mapPoint;
-            dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x.toFixed(2) + " , " + mp.y.toFixed(2);
+            dojo.byId("XYinfo").innerHTML = "坐标：" + mp.x + " , " + mp.y;
         }
 
-        /*map.on("key-down", function (e) {
+        /* map.on("key-down", function (e) {
          if (e.keyCode == 27) {
          remove();
          } else if (e.keyCode == 83) {
@@ -896,11 +902,11 @@
             document.getElementById('type13').innerHTML = "";
             drawTable();
 
-            vue.searchResultNum="";
-            vue.tableResultFeatures=[];
-            vue.filterResult=[];
-            vue.allChecked=true;
-            vue.showList=false;
+            vue.searchResultNum = "";
+            vue.tableResultFeatures = [];
+            vue.filterResult = [];
+            vue.allChecked = true;
+            vue.showList = false;
         }
 
         function removeTable() {
@@ -935,7 +941,7 @@
             el: "body",
             data: {
                 searchResult: "",
-                searchResultNum:"",
+                searchResultNum: "",
                 checked: [],
                 showList: false,
                 list: _listType,
@@ -983,7 +989,7 @@
                     this.showList = !this.showList;
                 },
                 searchTable: function (value) {
-                    this.searchResultNum="";
+                    this.searchResultNum = "";
                     value = value.trim();
                     var myfilterResult = [];
                     this.filterResult.forEach(function (item) {
@@ -999,7 +1005,7 @@
                             myfilterResult.push(item);
                         }
                     });
-                    this.searchResultNum=myfilterResult.length+"条结果";
+                    this.searchResultNum = myfilterResult.length + "条结果";
                     drawTable(myfilterResult);
                 }
             }

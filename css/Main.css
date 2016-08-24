@@ -72,7 +72,7 @@ html, body, #mainWindow
 {
     position: absolute;
     top: 110px;
-    left: 252px;
+    left: 24px;
     z-index: 50;
 }
 
@@ -80,10 +80,15 @@ html, body, #mainWindow
 {
     position: absolute;
     top: 150px;
-    left: 252px;
+    left: 24px;
     z-index: 50;
 }
-
+#BasemapToggle {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    z-index: 50;
+}
 #esri_dijit_editing_TemplatePicker_0
 {
     height: 720px;
