@@ -1,4 +1,7 @@
-﻿.dj_ie .infowindow .window .top .right .user .content
+﻿[v-cloak] {
+    display: none;
+}
+.dj_ie .infowindow .window .top .right .user .content
 {
     position: relative;
 }

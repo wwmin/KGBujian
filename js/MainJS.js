@@ -509,7 +509,8 @@
                 }
             }
             evtFileters = resultFeaturesFilter;
-            vue.tableResultFeatures=evtFileters;
+            vue.tableResultFeatures = evtFileters;
+            vue.filterResult = evtFileters;
             drawTable(resultFeaturesFilter);
             // console.log(resultFeaturesFilter);
             var total = sumPopulation(evt.featureSet);
@@ -894,6 +895,12 @@
             document.getElementById('type12').innerHTML = "";
             document.getElementById('type13').innerHTML = "";
             drawTable();
+
+            vue.searchResultNum="";
+            vue.tableResultFeatures=[];
+            vue.filterResult=[];
+            vue.allChecked=true;
+            vue.showList=false;
         }
 
         function removeTable() {
@@ -927,10 +934,13 @@
         var vue = new Vue({
             el: "body",
             data: {
+                searchResult: "",
+                searchResultNum:"",
                 checked: [],
                 showList: false,
                 list: _listType,
-                tableResultFeatures:[]
+                tableResultFeatures: [],
+                filterResult: []
             },
             computed: {
                 allChecked: {
@@ -953,20 +963,44 @@
                     }
                 }
             },
-            watch:{
-                checked:function(value,oldValue){
-                    console.log(value);
-                    console.log(this.tableResultFeatures);
-                    var filterResult;
-                    forEach(this.tableResultFeatures,function(item){
-
+            watch: {
+                checked: function (value, oldValue) {
+                    var filterResult = [];
+                    this.tableResultFeatures.forEach(function (item) {
+                        for (var i = 0, il = value.length; i < il; i++) {
+                            if (item.attributes.Type[0] == value[i]) {
+                                filterResult.push(item);
+                                break;
+                            }
+                        }
                     });
+                    this.filterResult = filterResult;
                     drawTable(filterResult);
                 }
             },
             methods: {
                 showListType: function () {
                     this.showList = !this.showList;
+                },
+                searchTable: function (value) {
+                    this.searchResultNum="";
+                    value = value.trim();
+                    var myfilterResult = [];
+                    this.filterResult.forEach(function (item) {
+                        function hasValue(it, value) {
+                            if (undefined != it && null != it) {
+                                return it.toString().search(value) > -1
+                            } else {
+                                return false
+                            }
+                        }
+
+                        if (hasValue(item.attributes.Type[0], value) || hasValue(item.attributes.ROAD_LANE[0], value) || hasValue(item.attributes.Num[0], value) || hasValue(item.attributes.CRDate[0], value)) {
+                            myfilterResult.push(item);
+                        }
+                    });
+                    this.searchResultNum=myfilterResult.length+"条结果";
+                    drawTable(myfilterResult);
                 }
             }
         });

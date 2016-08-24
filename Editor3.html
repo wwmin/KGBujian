@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,7 +23,7 @@
         </script>-->
 
 </head>
-<body class="claro">
+<body class="claro" >
 <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:true" id="mainWindow">
     <!--        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"
                 style="background-color: #b39b86; height: 5%;">
@@ -126,10 +126,10 @@
                 </div>
                 <hr>
                 <div class="pull-right search">
-                    <input class="form-control input-outline" type="text" placeholder="搜索">
-                    <button type="button" class="btn btn-default">搜索</button>
+                    <input  type="text" placeholder="对已选类型结果的查询 ..." v-model="searchResult"  v-on:keyup.enter="searchTable(searchResult)">
+                    <button type="button" v-on:click.stop="searchTable(searchResult)">搜索</button><span>{{searchResultNum}}</span>
                     <button type="button" @click="showListType">
-                        下拉选择
+                        选择显示类型
                     </button>
                 </div>
                 <div class="toggle" title="">
