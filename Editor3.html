@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html xmlns:v-on="http://www.w3.org/1999/xhtml">
+<html xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -44,7 +44,7 @@
                 <span style="font-size: smaller; padding: 5px 5px;">按住<b>CTRL</b> 捕捉.</span>
             </div>
         </div>
-        <div id="BasemapToggle"></div>
+
         <div id="HomeButton"></div>
         <div id="LocateButton"></div>
         <span id="XYinfo"
@@ -131,6 +131,11 @@
                 </div>
                 <hr>
                 <div class="pull-right search">
+                    <select  v-model = "selected">
+                        <option v-for="option in options" v-bind:value="option.value" v-text="option.text">
+                        </option>
+                    </select>
+
                     <input  type="text" placeholder="对已选类型结果的查询 ..." v-model="searchResult"  v-on:keyup.enter="searchTable(searchResult)">
                     <button type="button" v-on:click.stop="searchTable(searchResult)">搜索</button><span>{{searchResultNum}}</span>
                     <button type="button" @click="showListType">
@@ -191,5 +196,8 @@
 <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
 <![endif]-->
 <script type="text/javascript" src="js/MainJS.js"></script>
+<script>
+    console.log("欢迎交流,wwei.min@163.com");
+</script>
 </body>
 </html>

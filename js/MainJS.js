@@ -1,4 +1,5 @@
 ﻿require(["dojo/dom", "dojo/parser", "dijit/registry", "esri/config", "esri/sniff", 'dojo/on', "esri/map",
+
         "esri/layers/ArcGISTiledMapServiceLayer", "esri/layers/ArcGISDynamicMapServiceLayer",
         "esri/layers/FeatureLayer", "esri/tasks/GeometryService", "esri/units", "esri/geometry/Extent",
         "esri/SpatialReference", "esri/InfoTemplate", "esri/graphic", "esri/layers/GraphicsLayer", "esri/toolbars/draw",
@@ -10,7 +11,8 @@
         "dijit/ToolbarSeparator", "esri/dijit/HomeButton", "esri/dijit/LocateButton", "esri/dijit/OverviewMap",
         "esri/dijit/Scalebar", "esri/SnappingManager", "esri/dijit/BasemapToggle", "esri/dijit/Measurement",
         "dojox/grid/DataGrid", "dijit/TitlePane", "dijit/form/Button", "dijit/layout/BorderContainer",
-        "dijit/layout/ContentPane", "dijit/layout/AccordionContainer", "dojo/domReady!"],
+        "dijit/layout/ContentPane", "dijit/layout/AccordionContainer",
+        "esri/dijit/BasemapGallery","dojo/domReady!"],
     function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer,
               FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
               PictureMarkerSymbol, SimpleRenderer, SimpleLineSymbol, SimpleFillSymbol, Color, Editor, Print, AttributeInspector,
@@ -18,6 +20,7 @@
               HomeButton, LocateButton, OverviewMap, Scalebar, SnappingManager, BasemapToggle, Measurement) {
         parser.parse();
         //var extent = new Extent(-95.271, 38.933, -95.228, 38.976, new SpatialReference({ wkid: 4326 }));
+
         var map = new Map("map", {
             //center: [-117.535, 34.28],
             //extent:extent,
@@ -50,13 +53,6 @@
                 geoLocate.startup();
             });
         }
-
-        //卫星底图
-        var toggle = new BasemapToggle({
-            map: map,
-            basemap: "satellite"
-        }, "BasemapToggle");
-        toggle.startup();
 
         var overviewMapDijit = new OverviewMap({
             map: map,  //必要的
@@ -940,6 +936,14 @@
         var vue = new Vue({
             el: "body",
             data: {
+                selected:'全部',
+                options:[
+                    {text:'全部',value:'全部'},
+                    {text:'序号',value:'序号'},
+                    {text:'类型',value:'类型'},
+                    {text:'时间',value:'时间'},
+                    {text:'道路名',value:'道路名'}
+                ],
                 searchResult: "",
                 searchResultNum: "",
                 checked: [],
