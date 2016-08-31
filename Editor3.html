@@ -136,7 +136,8 @@
                         </option>
                     </select>
 
-                    <input  type="text" placeholder="对已选类型结果的查询 ..." v-model="searchResult"  v-on:keyup.enter="searchTable(searchResult)">
+                    <input  type="text" style="width: 140px;" placeholder="对已选类型结果的查询 ..." v-model="searchResult"
+                            v-on:keyup.enter="searchTable(searchResult)">
                     <button type="button" v-on:click.stop="searchTable(searchResult)">搜索</button><span>{{searchResultNum}}</span>
                     <button type="button" @click="showListType">
                         选择显示类型

@@ -12,7 +12,7 @@
         "esri/dijit/Scalebar", "esri/SnappingManager", "esri/dijit/BasemapToggle", "esri/dijit/Measurement",
         "dojox/grid/DataGrid", "dijit/TitlePane", "dijit/form/Button", "dijit/layout/BorderContainer",
         "dijit/layout/ContentPane", "dijit/layout/AccordionContainer",
-        "esri/dijit/BasemapGallery","dojo/domReady!"],
+        "esri/dijit/BasemapGallery", "dojo/domReady!"],
     function (dom, parser, registry, esriConfig, has, on, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer,
               FeatureLayer, GeometryService, Units, Extent, SpatialReference, InfoTemplate, Graphic, GraphicsLayer, Draw,
               PictureMarkerSymbol, SimpleRenderer, SimpleLineSymbol, SimpleFillSymbol, Color, Editor, Print, AttributeInspector,
@@ -936,13 +936,14 @@
         var vue = new Vue({
             el: "body",
             data: {
-                selected:'全部',
-                options:[
-                    {text:'全部',value:'全部'},
-                    {text:'序号',value:'序号'},
-                    {text:'类型',value:'类型'},
-                    {text:'时间',value:'时间'},
-                    {text:'道路名',value:'道路名'}
+                selected: '全部',
+                searchOption: "",
+                options: [
+                    {text: '全部', value: '全部'},
+                    {text: '序号', value: '序号'},
+                    {text: '类型', value: '类型'},
+                    {text: '时间', value: '时间'},
+                    {text: '路名', value: '路名'}
                 ],
                 searchResult: "",
                 searchResultNum: "",
@@ -993,6 +994,7 @@
                     this.showList = !this.showList;
                 },
                 searchTable: function (value) {
+                    var self = this;
                     this.searchResultNum = "";
                     value = value.trim();
                     var myfilterResult = [];
@@ -1004,10 +1006,36 @@
                                 return false
                             }
                         }
-
-                        if (hasValue(item.attributes.Type[0], value) || hasValue(item.attributes.ROAD_LANE[0], value) || hasValue(item.attributes.Num[0], value) || hasValue(item.attributes.CRDate[0], value)) {
-                            myfilterResult.push(item);
+                        switch (self.selected) {
+                            case "全部":
+                                if (hasValue(item.attributes.Type[0], value) || hasValue(item.attributes.ROAD_LANE[0], value) || (hasValue(item.attributes.Num[0], value) && item.attributes.Num[0].toString() == value) || hasValue(item.attributes.CRDate[0], value)) {
+                                    myfilterResult.push(item);
+                                }
+                                break;
+                            case "序号":
+                                if (hasValue(item.attributes.Num[0], value) && item.attributes.Num[0].toString() == value) {
+                                    myfilterResult.push(item);
+                                }
+                                break;
+                            case "类型":
+                                if (hasValue(item.attributes.Type[0], value)) {
+                                    myfilterResult.push(item);
+                                }
+                                break;
+                            case "时间":
+                                if (hasValue(item.attributes.CRDate[0], value)) {
+                                    myfilterResult.push(item);
+                                }
+                                break;
+                            case "路名":
+                                if (hasValue(item.attributes.ROAD_LANE[0], value)) {
+                                    myfilterResult.push(item);
+                                }
+                                break;
+                            default :
+                                break;
                         }
+
                     });
                     this.searchResultNum = myfilterResult.length + "条结果";
                     drawTable(myfilterResult);
